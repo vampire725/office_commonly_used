@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration >
+    <classPathEntry location="D:\repository\mysql\mysql-connector-java\5.1.41/mysql-connector-java-5.1.41.jar"/>
+  <context id="context1" >
+    <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://10.20.20.34:3306/ap-system-y" userId="root" password="asd123" />
+    <javaModelGenerator targetPackage="com.sinosoft.ap.system.log.domain" targetProject="Ap_M/src/main/java" />
+    <sqlMapGenerator targetPackage="com.sinosoft.ap.system.log.mapper" targetProject="Ap_M/src/main/resources" />
+    <javaClientGenerator targetPackage="com.sinosoft.ap.system.log.domain" targetProject="Ap_M/src/main/java" type="XMLMAPPER" />
+    <table schema="ap-system" tableName="aps_user_visite_system_log" >
+    </table>
+  </context>
+</generatorConfiguration>

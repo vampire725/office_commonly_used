@@ -1,0 +1,116 @@
+# 运行CI容器使用的镜像
+image: docker:18.09-git
+
+# 配置环境变量
+variables:
+  # [D]指定Docker使用overlay存储
+  DOCKER_DRIVER: overlay2
+  # 提交到临时仓库的镜像名称：$临时仓库名/$项目名称:$当前CommitID
+  TEMP_COMMIT_IMAGE: $TEMP_COMMIT_IMAGE_REGISTRY/$CI_PROJECT_NAME:$CI_COMMIT_SHORT_SHA
+  # 提交到正式仓库的镜像名称：$正式仓库名/$项目名称:$当前CommitID
+  PRODUCTION_COMMIT_IMAGE: $PRODUCTION_IMAGE_REGISTRY/$CI_PROJECT_NAME:$CI_COMMIT_SHORT_SHA
+
+# 设定4个阶段，依次执行阶段中的任务
+stages:
+  - build_image
+  - test
+  - release
+  - rmi_image
+
+# 设定初始化脚本，每个任务开始前都会执行一遍
+before_script:
+  # 获取当前
+  - export IMAGE_TAG=$(git describe --tags)
+  - echo $IMAGE_TAG
+  - mkdir -p /etc/docker/certs.d/$CI_REGISTRY
+  - cp cert/domain.crt /etc/docker/certs.d/$CI_REGISTRY/ca.crt
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+# =====================
+# 除去image，variables，stages，before_script等保留词，以下格式的均为任务
+
+# 构建镜像任务
+build_image:
+  # 任务所属阶段
+  stage: build_image
+  # 指定该任务只在master和pre-production分支上发生
+  only:
+    - master
+    - pre-production
+  # 实际执行的动作，一个命令一行
+  script:
+    - docker build -t $TEMP_COMMIT_IMAGE .
+
+# 单元测试任务
+unit_test:
+  stage: test
+  only:
+    - master
+  script:
+    - docker run -t --rm --name unit-test-$IMAGE_TAG  $TEMP_COMMIT_IMAGE python t.py
+
+# 集成测试任务
+integrated_test:
+  stage: test
+  only:
+    - master
+  script:
+    - docker run -it -d --name integrated-test-$IMAGE_TAG $TEMP_COMMIT_IMAGE
+    - docker logs integrated_test-$IMAGE_TEST_TAG
+    - docker rm -f integrated-test-$IMAGE_TAG
+
+# 将镜像推送到临时仓库
+release_temp_image:
+  stage: release
+  only:
+    - pre-production
+  script:
+    - docker push $TEMP_COMMIT_IMAGE
+
+# 将镜像推送到正式仓库
+release_production_image:
+  stage: release
+  # 限制只有在git tag动作的时候才触发任务
+  only:
+    - tags
+  # 除去
+  except:
+    - /^issue-.*$/
+    - /^fix-.*$/
+    - /^feature-.*$/
+    - master
+    - production
+  script:
+    - export PRODUCTION_IMAGE=$PRODUCTION_IMAGE_REGISTRY/$CI_PROJECT_NAME:IMAGE_TAG
+    - echo PRODUCTION_IMAGE
+    - docker pull $TEMP_COMMIT_IMAGE
+    - docker tag $TEMP_COMMIT_IMAGE $PRODUCTION_COMMIT_IMAGE
+    - docker tag $TEMP_COMMIT_IMAGE $PRODUCTION_IMAGE
+    - docker push $PRODUCTION_COMMIT_IMAGE
+    - docker push $PRODUCTION_IMAGE
+
+# 为稳定版镜像打标签
+release_production_stable_image:
+  stage: release
+  only:
+    - tags
+  tags:
+    - production
+  except:
+    - /^issue-.*$/
+    - /^fix-.*$/
+    - /^feature-.*$/
+    - master
+    - pre-production
+  script:
+    - export PRODUCTION_STABLE_IMAGE=$PRODUCTION_IMAGE_REGISTRY/$CI_PROJECT_NAME:IMAGE_TAG-stable
+    - echo $PRODUCTION_STABLE_IMAGE
+    - docker pull $PRODUCTION_COMMIT_IMAGE
+    - docker tag $PRODUCTION_COMMIT_IMAGE $PRODUCTION_STABLE_IMAGE
+    - docker push $PRODUCTION_STABLE_IMAGE
+
+# 清理临时镜像
+rmi_image:
+  stage: rmi_image
+  script:
+    - docker rmi -f $TEMP_COMMIT_IMAGE $PRODUCTION_COMMIT_IMAGE $PRODUCTION_IMAGE $PRODUCTION_STABLE_IMAGE

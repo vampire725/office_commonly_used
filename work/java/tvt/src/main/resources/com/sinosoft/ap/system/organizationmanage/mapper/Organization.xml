@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sinosoft.ap.system.organizationmanage.domain.OrganizationRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.organizationmanage.domain.OrganizationEntity">
+        <result column="ORGAN_PARENT_ID" property="organParentId"/>
+        <result column="ORGAN_ID" property="organId"/>
+        <result column="ORGAN_CREATETIME" property="organCreatetime"/>
+        <result column="ORGAN_LEVEL" property="organLevel"/>
+        <result column="ORGAN_SORT" property="organSort"/>
+        <result column="ORGAN_CODE" property="organCode"/>
+        <result column="ORGAN_DESC" property="organDesc"/>
+        <result column="ORGAN_NAME" property="organName"/>
+        <result column="ORGAN_PATH" property="organPath"/>
+    </resultMap>
+    <resultMap id="organTreeMap" type="com.sinosoft.ap.system.organizationmanage.domain.UserOrganizationTree">
+        <result column="ORGAN_PARENT_ID" property="parentId"/>
+        <result column="ORGAN_ID" property="id"/>
+        <result column="ORGAN_CREATETIME" property="reatetime"/>
+        <result column="ORGAN_SORT" property="organSort"/>
+        <result column="ORGAN_CODE" property="code"/>
+        <result column="ORGAN_DESC" property="desc"/>
+        <result column="ORGAN_NAME" property="name"/>
+        <result column="ORGAN_PATH" property="path"/>
+    </resultMap>
+    <resultMap id="userTreeMap" type="com.sinosoft.ap.system.organizationmanage.domain.UserOrganizationTree">
+        <result column="USER_ID" property="id"/>
+        <result column="USER_CREATETIME" property="reatetime"/>
+        <result column="USER_ID_CODE" property="code"/>
+        <result column="USER_ACCOUNT" property="name"/>
+        <result column="ORGAN_ID" property="parentId"/>
+    </resultMap>
+
+    <sql id="sql">
+	    ORGAN_PARENT_ID,
+	    ORGAN_ID,
+	    ORGAN_CREATETIME,
+	    ORGAN_LEVEL,
+	    ORGAN_SORT,
+	    ORGAN_CODE,
+	    ORGAN_DESC,
+	    ORGAN_NAME,
+	    ORGAN_PATH
+    </sql>
+
+    <insert id="insert" parameterType="com.sinosoft.ap.system.organizationmanage.domain.OrganizationEntity">
+        INSERT INTO APS_ORGANIZATION(<include refid="sql"/>) VALUES
+        (
+        #{organParentId},
+        #{organId},
+        #{organCreatetime},
+        #{organLevel},
+        #{organSort},
+        #{organCode},
+        #{organDesc},
+        #{organName},
+        #{organPath}
+        );
+    </insert>
+
+    <delete id="delete" parameterType="java.lang.String">
+		DELETE FROM APS_ORGANIZATION WHERE ORGAN_ID = #{organId}; 
+	</delete>
+
+    <update id="update" parameterType="com.sinosoft.ap.system.organizationmanage.domain.OrganizationEntity">
+        UPDATE APS_ORGANIZATION
+        <trim prefix="SET" prefixOverrides=",">
+            <if test="organCreatetime != null ">
+                ORGAN_CREATETIME =#{organCreatetime}
+            </if>
+            <if test="organLevel != null &amp;&amp; organLevel != ''">
+                ,ORGAN_LEVEL =#{organLevel}
+            </if>
+            <if test="organSort != null &amp;&amp; organSort != ''">
+                ,ORGAN_SORT =#{organSort}
+            </if>
+            <if test="organCode != null &amp;&amp; organCode != ''">
+                ,ORGAN_CODE =#{organCode}
+            </if>
+            <if test="organDesc != null &amp;&amp; organDesc != ''">
+                ,ORGAN_DESC =#{organDesc}
+            </if>
+            <if test="organName != null &amp;&amp; organName != ''">
+                ,ORGAN_NAME =#{organName}
+            </if>
+            <if test="organPath != null &amp;&amp; organPath != ''">
+                ,ORGAN_PATH =#{organPath}
+            </if>
+            <if test="organParentId != null &amp;&amp; organParentId != ''">
+                ,ORGAN_PARENT_ID =#{organParentId}
+            </if>
+        </trim>
+        where
+        ORGAN_ID = #{organId}
+    </update>
+
+    <select id="select" resultMap="baseMap"
+            parameterType="com.sinosoft.ap.system.organizationmanage.domain.OrganizationEntity">
+        SELECT
+        <include refid="sql"/>
+        from APS_ORGANIZATION
+        WHERE
+        1=1
+        <if test="organParentId != null &amp;&amp; organParentId != ''">
+            AND ORGAN_PARENT_ID =#{organParentId}
+        </if>
+        <if test="organId != null &amp;&amp; organId != ''">
+            AND ORGAN_ID =#{organId}
+        </if>
+        <if test="organCreatetime != null">
+            AND ORGAN_CREATETIME =#{organCreatetime}
+        </if>
+        <if test="organLevel != null &amp;&amp; organLevel != ''">
+            AND ORGAN_LEVEL =#{organLevel}
+        </if>
+        <if test="organCode != null &amp;&amp; organCode != ''">
+            AND ORGAN_CODE =#{organCode}
+        </if>
+        <if test="organDesc != null &amp;&amp; organDesc != ''">
+            AND ORGAN_DESC =#{organDesc}
+        </if>
+        <if test="organName != null &amp;&amp; organName != ''">
+            AND ORGAN_NAME =#{organName}
+        </if>
+        <if test="organPath != null &amp;&amp; organPath != ''">
+            AND ORGAN_PATH =#{organPath}
+        </if>
+        order by ORGAN_SORT
+    </select>
+
+
+
+
+    <select id="selectByCodeLike" resultMap="baseMap"
+            parameterType="string">
+        SELECT
+        <include refid="sql"/>
+        from APS_ORGANIZATION
+        WHERE
+        ORGAN_CODE like concat(concat('%',#{_parameter}),'%')
+    </select>
+
+
+
+
+    <select id="selectUserTree" resultMap="userTreeMap" parameterType="String">
+    	SELECT
+    	a.USER_ID,
+	    a.USER_CREATETIME,
+	    a.USER_ID_CODE,
+	    a.USER_ACCOUNT,
+	    b.ORGAN_ID
+	    from  APS_USER as a
+	    join APS_USER_ORGANIZATION_REL as b on b.USER_ID = a.USER_ID
+	    where 1=1
+        <if test="_parameter != null &amp;&amp; _parameter != ''">
+            AND b.ORGAN_ID =#{_parameter}
+        </if>
+	    order by a.USER_CREATETIME
+    </select>
+    <select id="selectOrganTree" resultMap="organTreeMap" parameterType="String">
+    	SELECT
+    	ORGAN_PARENT_ID,
+	    ORGAN_ID,
+	    ORGAN_CREATETIME,
+	    ORGAN_SORT,
+	    ORGAN_CODE,
+	    ORGAN_DESC,
+	    ORGAN_NAME,
+	    ORGAN_PATH
+	    from  APS_ORGANIZATION
+	    where 1=1
+        <if test="_parameter != null &amp;&amp; _parameter != ''">
+            AND ORGAN_PARENT_ID =#{_parameter}
+        </if>
+	    order by ORGAN_SORT
+    </select>
+
+    <select id="selectByUserId" parameterType="string" resultMap="baseMap">
+    	SELECT
+    	*
+	    from  APS_ORGANIZATION
+	    left join APS_USER_ORGANIZATION_REL on APS_USER_ORGANIZATION_REL.ORGAN_ID = APS_ORGANIZATION.ORGAN_ID
+	    where APS_USER_ORGANIZATION_REL.USER_ID = #{_parameter}
+    </select>
+    
+    <select id="selectOrganListByUserId" parameterType="string" resultMap="baseMap">
+		select a.* from aps_organization a 
+		where 
+		find_in_set(
+		(select aps_user_organization_rel.ORGAN_ID from aps_user_organization_rel
+		where aps_user_organization_rel.USER_ID = #{_parameter}
+		), a.ORGAN_PATH)
+    </select>
+</mapper>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>docker端口映射</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="created" content="2018-09-25T22:24:24+0800"/>
+        <meta name="modified" content="2018-09-25T22:38:51+0800"/>
+        <meta name="tags" content=""/>
+        <meta name="last device" content="zd的MacBook Pro"/>
+    </head>
+    <body>
+        <div class="note-wrapper">
+            <h1>docker端口映射</h1>
+<hr>
+<h3>映射方法</h3>
+<ol start="1"><li>对容器暴露的所有端口，随机映射宿主机端口
+</li></ol>
+<p><code class='code-inline'>-P, –publish-all=true | false，默认为false</code></p>
+<p><code class='code-inline'>docker run -P -it ubuntu /bin/bash</code></p>
+<blockquote>
+<p>将端口全部映射到宿主机随机端口上，端口范围49000~49900。</p>
+</blockquote>
+<br>
+<ol start="2"><li>映射宿主机随机端口到容器指定端口
+</li></ol>
+<p><code class='code-inline'>-p containerPort( -p表示 –publish=[ ] )</code></p>
+<p><code class='code-inline'>docker run -p 80 -it ubuntu /bin/bash</code></p>
+<blockquote>
+<p>将容器的80端口映射到宿主机的随机端口上。</p>
+</blockquote>
+<br>
+<ol start="3"><li>映射宿主机指定端口到容器指定端口（一 一对应）
+</li></ol>
+<p><code class='code-inline'>-p hostPort : containerPort</code></p>
+<p><code class='code-inline'>docker run -p 8080:80 -it ubuntu /bin/bash</code></p>
+<blockquote>
+<p>将容器的80端口映射到宿主机的8080端口上。</p>
+</blockquote>
+<br>
+<ol start="4"><li>指定容器IP和容器端口，宿主机端口随机映射
+</li></ol>
+<p><code class='code-inline'>ip::containerPort</code></p>
+<p><code class='code-inline'>docker run -p 127.0.0.12::80 -it ubuntu /bin/bash</code></p>
+<blockquote>
+<p>将容器的80端口映射到宿主机指定ip为127.0.0.12的随机端口上。</p>
+</blockquote>
+<br>
+<ol start="5"><li>指定容器IP、宿主机端口、容器端口
+</li></ol>
+<p><code class='code-inline'>ip:hostPort:containerPort</code></p>
+<p><code class='code-inline'>docker run -p 127.0.0.12:8080:80 -it ubuntu /bin/bash</code></p>
+<blockquote>
+<p>将容器的80端口映射到宿主机指定ip为127.0.0.12的8080端口上。</p>
+</blockquote>
+<br>
+<ul><li>注意：如需要对多端口进行映射可以使用多个-p形式，例如
+</li></ul>
+<p><code class='code-inline'>docker run -p 8080:80 -p 3306:3306 -it ubuntu /bin/bash</code></p>
+<hr>
+<h3>查看映射关系</h3>
+<blockquote>
+<p><mark>docker port</mark> 来查看当前映射的端口配置，也可以查看到绑定的地址</p>
+</blockquote>
+<pre><code class='code-multiline'>docker run --name=mysql -it -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -d mysql
+docker port mysql
+3306/tcp -&gt; 0.0.0.0:3306
+docker port mysql 3306
+0.0.0.0:3306
+</code></pre><blockquote>
+以上命令为以mysql镜像启动一个名字为mysql的容器，映射容器3306端口至宿主机的3306端口上。
+查看名字为mysql容器的映射关系，也可以利用<mark>CONTAINER ID</mark>进行查询。
+</blockquote>
+<hr>
+<h3>已启动的容器做端口映射</h3>
+<blockquote>
+目前未发现特别好的方法，一种解决方案如下:
+假设我们要将目前启动的test01容器的8080端口，映射到宿主机的8080端口上(<mark>docker -ps -a</mark> 查看停止的容器的相关信息)。
+</blockquote>
+<ol start="1"><li>停止目前启动的容器
+</li></ol>
+<p><code class='code-inline'>docker stop test01</code></p>
+<ol start="2"><li>利用commit命令，新建一个image
+</li></ol>
+<p><code class='code-inline'>docker commit test01 test02</code></p>
+<ol start="3"><li>利用-p参数启动新容器，从新建的image
+</li></ol>
+<p><code class='code-inline'>docker run -ti -p 8080:8080 test02</code></p>
+        </div>
+        <script type="text/javascript">
+            (function() {
+
+    var doc_ols = document.getElementsByTagName("ol");
+
+    for ( i=0; i<doc_ols.length; i++) {
+
+        var ol_start = doc_ols[i].getAttribute("start") - 1;
+        doc_ols[i].setAttribute("style", "counter-reset:ol " + ol_start + ";");
+
+    }
+
+})();
+        </script>
+        <style>
+            html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline}html{line-height:1}ol,ul{list-style:none}table{border-collapse:collapse;border-spacing:0}caption,th,td{text-align:left;font-weight:normal;vertical-align:middle}q,blockquote{quotes:none}q:before,q:after,blockquote:before,blockquote:after{content:"";content:none}a img{border:none}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}*{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}html{font-size:87.5%;line-height:1.57143em}html{font-size:14px;line-height:1.6em;-webkit-text-size-adjust:100%}body{background:#fcfcfc;color:#545454;text-rendering:optimizeLegibility;font-family:"AvenirNext-Regular"}a{color:#de4c4f;text-decoration:none}h1{font-family:"AvenirNext-Medium";color:#333;font-size:1.6em;line-height:1.3em;margin-bottom:.78571em}h2{font-family:"AvenirNext-Medium";color:#333;font-size:1.3em;line-height:1em;margin-bottom:.62857em}h3{font-family:"AvenirNext-Medium";color:#333;font-size:1.15em;line-height:1em;margin-bottom:.47143em}p{margin-bottom:1.57143em;hyphens:auto}hr{height:1px;border:0;background-color:#dedede;margin:-1px auto 1.57143em auto}ul,ol{margin-bottom:.31429em}ul ul,ul ol,ol ul,ol ol{margin-bottom:0px}ol li:before{content:counter(ol) ".";counter-increment:ol;color:#e06e73;text-align:right;display:inline-block;min-width:1em;margin-right:0.5em}b,strong{font-family:"AvenirNext-Bold"}i,em{font-family:"AvenirNext-Italic"}code{font-family:"Menlo-Regular"}.text-overflow-ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sf_code_string,.sf_code_selector,.sf_code_attr-name,.sf_code_char,.sf_code_builtin,.sf_code_inserted{color:#D33905}.sf_code_comment,.sf_code_prolog,.sf_code_doctype,.sf_code_cdata{color:#838383}.sf_code_number,.sf_code_boolean{color:#0E73A2}.sf_code_keyword,.sf_code_atrule,.sf_code_rule,.sf_code_attr-value,.sf_code_function,.sf_code_class-name,.sf_code_class,.sf_code_regex,.sf_code_important,.sf_code_variable,.sf_code_interpolation{color:#0E73A2}.sf_code_property,.sf_code_tag,.sf_code_constant,.sf_code_symbol,.sf_code_deleted{color:#1B00CE}.sf_code_macro,.sf_code_entity,.sf_code_operator,.sf_code_url{color:#920448}.note-wrapper{max-width:46em;margin:0px auto;padding:1.57143em 3.14286em}.note-wrapper.spotlight-preview{overflow-x:hidden}u{text-decoration:none;background-image:linear-gradient(to bottom, rgba(0,0,0,0) 50%,#e06e73 50%);background-repeat:repeat-x;background-size:2px 2px;background-position:0 1.05em}s{color:#878787}p{margin-bottom:0.1em}hr{margin-bottom:0.7em;margin-top:0.7em}ul li{text-indent:-0.35em}ul li:before{content:"•";color:#e06e73;display:inline-block;margin-right:0.3em}ul ul{margin-left:1.25714em}ol li{text-indent:-1.45em}ol ol{margin-left:1.25714em}blockquote{display:block;margin-left:-1em;padding-left:0.8em;border-left:0.2em solid #e06e73}.todo-list ul{margin-left:1.88571em}.todo-list li{text-indent:-1.75em}.todo-list li:before{content:"";display:static;margin-right:0px}.todo-checkbox{text-indent:-1.7em}.todo-checkbox svg{margin-right:0.3em;position:relative;top:0.2em}.todo-checkbox svg #check{display:none}.todo-checkbox.todo-checked #check{display:inline}.todo-checkbox.todo-checked .todo-text{text-decoration:line-through;color:#878787}.code-inline{display:inline;background:white;border:solid 1px #dedede;padding:0.2em 0.5em;font-size:0.9em}.code-multiline{display:block;background:white;border:solid 1px #dedede;padding:0.7em 1em;font-size:0.9em;overflow-x:auto}.hashtag{display:inline-block;color:white;background:#b8bfc2;padding:0.0em 0.5em;border-radius:1em;text-indent:0}.hashtag a{color:#fff}.address a{color:#545454;background-image:linear-gradient(to bottom, rgba(0,0,0,0) 50%,#0da35e 50%);background-repeat:repeat-x;background-size:2px 2px;background-position:0 1.05em}.address svg{position:relative;top:0.2em;display:inline-block;margin-right:0.2em}.color-preview{display:inline-block;width:1em;height:1em;border:solid 1px rgba(0,0,0,0.3);border-radius:50%;margin-right:0.1em;position:relative;top:0.2em;white-space:nowrap}.color-code{margin-right:0.2em;font-family:"Menlo-Regular";font-size:0.9em}.color-hash{opacity:0.4}.ordered-list-number{color:#e06e73;text-align:right;display:inline-block;min-width:1em}.arrow svg{position:relative;top:0.08em;display:inline-block;margin-right:0.15em;margin-left:0.15em}.arrow svg #rod{stroke:#545454}.arrow svg #point{fill:#545454}mark{color:inherit;display:inline;padding:0.2em 0.5em;background-color:#fcffc0}img{max-width:100%;height:auto}
+
+        </style>
+    </body>
+</html>

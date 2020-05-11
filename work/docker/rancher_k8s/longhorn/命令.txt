@@ -1,0 +1,9 @@
+1、更改console为Ubuntu
+2、安装sudo apt install -y open-iscsi
+3、更改sudo vi /etc/iscsi/iscsid.conf
+	注释#iscsid.startup = /bin/systemctl start iscsid.socket
+	打开iscsid.startup = /sbin/iscsid
+4、安装/升级longhorn
+
+
+

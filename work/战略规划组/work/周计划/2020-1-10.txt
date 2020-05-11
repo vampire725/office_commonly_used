@@ -1,0 +1,10 @@
+工作详情：
+1. ffmpeg实现两个rtmp流视频拼接同时在rtmp服务端播放，但是还未能指定对应位置播放
+2. 重新设计production集群物理资源和集群角色分配，与其他团队讨论评估服务迁移计划和风险，最终确定迁移方案
+3. 升级playground集群kubernetes版本
+4. 更新gitlab测试项目devops-demo中的文档
+
+
+1. 使用ffmpeg实现不同音频来源合并，并且在rtmp服务端播放
+2. 确定production集群设计方案并实施，协助其他团队对安全迁移集群现有服务
+3. 维护和研究rancher上相关功能服务

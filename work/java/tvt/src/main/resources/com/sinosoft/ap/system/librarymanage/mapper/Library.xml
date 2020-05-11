@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.librarymanage.domain.LibraryRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.librarymanage.domain.LibraryEntity">
+	    <result column="LIBRARY_ID" property="libraryId" />
+	    <result column="LIBRARY_DESC" property="libraryDesc" />
+	    <result column="LIBRARY_CODE" property="libraryCode" />
+	    <result column="LIBRARY_NAME" property="libraryName" />
+	    <result column="LIBRARY_CREATETIME" property="libraryCreatetime" />
+	    <result column="LIBRARY_PARENT_ID" property="libraryParentId" />
+        <result column="LIBRARY_SYMBOL" property="librarySymbol" />
+        <result column="LIBRARY_LEVEL" property="libraryLevel" />
+    </resultMap>
+
+    <sql id="sql">
+	    LIBRARY_ID,
+	    LIBRARY_DESC,
+	    LIBRARY_CODE,
+	    LIBRARY_NAME,
+	    LIBRARY_CREATETIME,
+	    LIBRARY_PARENT_ID,
+        LIBRARY_SYMBOL,
+        LIBRARY_LEVEL
+    </sql>
+
+	<insert id="insert" parameterType="com.sinosoft.ap.system.librarymanage.domain.LibraryEntity">
+		INSERT INTO APS_LIBRARY(<include refid="sql" />) VALUES
+		(
+	    #{libraryId},
+	    #{libraryDesc},
+	    #{libraryCode},
+	    #{libraryName},
+	    #{libraryCreatetime},
+	    #{libraryParentId},
+        #{librarySymbol},
+        #{libraryLevel}
+		);
+	</insert>
+
+	<delete id="delete" parameterType="java.lang.String">
+		<!--DELETE FROM APS_LIBRARY -->
+		<!--WHERE-->
+		<!--LIBRARY_ID = #{libraryId}-->
+        <bind name="symbol" value="librarySymbol + '%'" />
+            DELETE FROM APS_LIBRARY
+            WHERE
+            LIBRARY_SYMBOL like #{symbol}
+	</delete>
+
+	<update id="update" parameterType="com.sinosoft.ap.system.librarymanage.domain.LibraryEntity">
+		UPDATE APS_LIBRARY  
+		<trim prefix="SET" prefixOverrides=",">
+		<if test ="libraryDesc != null &amp;&amp; libraryDesc !='' ">
+		,LIBRARY_DESC = #{libraryDesc}
+		</if>		
+		<if test ="libraryCode != null &amp;&amp; libraryCode != '' ">
+		,LIBRARY_CODE = #{libraryCode}
+		</if>
+		<if test ="libraryName != null &amp;&amp; libraryName != ''">
+		,LIBRARY_NAME = #{libraryName}
+		</if>		
+		<if test ="libraryCreatetime != null ">
+		,LIBRARY_CREATETIME = #{libraryCreatetime}
+		</if>
+		<if test ="libraryParentId != null &amp;&amp; libraryParentId != '' ">
+		,LIBRARY_PARENT_ID = #{libraryParentId}
+		</if>
+		</trim>		
+		where 
+		LIBRARY_ID = #{libraryId}
+	</update>
+	
+    <select id="select" resultMap="baseMap" parameterType="com.sinosoft.ap.system.librarymanage.vo.LibraryEntityVO">
+        SELECT <include refid="sql" /> from  APS_LIBRARY
+        WHERE
+        1=1
+		<if test ="libraryDesc != null &amp;&amp; libraryDesc !='' ">
+		AND LIBRARY_DESC ${libraryDesc}
+		</if>	
+		<if test ="libraryName != null &amp;&amp; libraryName != '' ">
+		AND LIBRARY_NAME ${libraryName}
+		</if>	
+		<if test ="libraryId != null &amp;&amp; libraryId != '' ">
+		AND LIBRARY_ID = #{libraryId}
+		</if>	
+		<if test ="libraryCode != null &amp;&amp; libraryCode != '' ">
+		AND LIBRARY_CODE = #{libraryCode}
+		</if>
+	<!-- 	<if test ="libraryCreatetime != null &amp;&amp; libraryCreatetime != ''">
+		AND LIBRARY_CREATETIME = #{libraryCreatetime}
+		</if> -->
+		<if test ="libraryParentId != null &amp;&amp; libraryParentId != '' ">
+		AND LIBRARY_PARENT_ID = #{libraryParentId}
+		</if>
+        <if test ="librarySymbol != null &amp;&amp; librarySymbol != ''">
+            AND LIBRARY_SYMBOL = #{librarySymbol}
+        </if>
+        <if test ="libraryLevel != null &amp;&amp; libraryLevel != '' ">
+            AND LIBRARY_LEVEL = #{libraryLevel}
+        </if>
+    </select>
+    
+    <select id="selectChild" resultMap="baseMap" parameterType="java.lang.String">
+    <!--SELECT B.* -->
+    <!--FROM APS_LIBRARY AS A -->
+	<!--JOIN APS_LIBRARY AS B ON A.LIBRARY_ID = B.LIBRARY_PARENT_ID-->
+	<!--WHERE A.LIBRARY_CODE = #{libraryCode}-->
+		<bind name="symbol" value="_parameter + '%'" />
+		select * from APS_LIBRARY where LIBRARY_SYMBOL like #{symbol}
+    </select>
+    
+</mapper>

@@ -1,0 +1,9 @@
+docker pull nginx:latest
+
+docker run -d -v $PWD/nginx.conf:/etc/nginx/nginx.conf -v $PWD/wj/:/usr/www/jqwj/dist/ -p 8085:8020 -p 8084:80 nginx:latest
+
+# -d 表示后台运行
+# -v 表示挂载，这里表示将本地nginx.conf配置文件挂载到/etc/nginx/nginx.conf位置，也就是覆盖容器内的配置
+# -v 同理，将本地wj文件夹下的所有文件挂载到容器内/usr/www/jqwj/dist/，如果容器内目录不存在会自动创建
+# -p 映射，把容器内8020端口映射到宿主机8085端口，同理将容器内80端口映射到宿主机8084端口
+# 最后nginx:latest表示使用的镜像及版本

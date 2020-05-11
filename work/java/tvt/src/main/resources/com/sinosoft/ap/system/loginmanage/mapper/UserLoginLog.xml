@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.loginmanage.domain.UserLoginLogRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.loginmanage.domain.UserLoginLogEntity">
+	    <result column="USER_LOGIN_LOG_ID" property="userLoginLogId" />
+	    <result column="USER_ID" property="userId" />
+	    <result column="LOGIN_TIME" property="loginTime" />
+	    <result column="LOGIN_USER" property="loginUser" />
+	    <result column="LOGIN_IP" property="loginIp" />
+	    <result column="LOGIN_OS" property="loginOs" />
+	    <result column="LOGIN_BROWER" property="loginBrower" />
+    </resultMap>
+
+    <sql id="sql">
+	    USER_LOGIN_LOG_ID,
+	    USER_ID,
+	    LOGIN_TIME,
+	    LOGIN_USER,
+	    LOGIN_IP,
+	    LOGIN_OS,
+	    LOGIN_BROWER
+    </sql>
+
+	<insert id="insert" parameterType="com.sinosoft.ap.system.loginmanage.domain.UserLoginLogEntity">
+		INSERT INTO APS_USER_LOGIN_LOG(<include refid="sql" />) VALUES
+		(
+	    #{userLoginLogId},
+	    #{userId},
+	    #{loginTime},
+	    #{loginUser},
+	    #{loginIp},
+	    #{loginOs},
+	    #{loginBrower}
+		);
+	</insert>
+
+	<delete id="delete" parameterType="com.sinosoft.ap.system.loginmanage.domain.UserLoginLogEntity">
+		DELETE FROM APS_USER_LOGIN_LOG 
+		WHERE
+		1=1
+		<if test ="userLoginLogId != null &amp;&amp; userLoginLogId != ''">
+		AND USER_LOGIN_LOG_ID = #{userLoginLogId}
+		</if>
+		<if test ="userId != null &amp;&amp; userId != ''">
+		AND USER_ID = #{userId}
+		</if>
+		<if test ="loginTime != null">
+		AND LOGIN_TIME = #{loginTime}
+		</if>
+		<if test ="loginUser != null &amp;&amp; loginUser != ''">
+		AND LOGIN_USER = #{loginUser}
+		</if>
+		<if test ="loginIp != null &amp;&amp; loginIp != ''">
+		AND LOGIN_IP = #{loginIp}
+		</if>
+		<if test ="loginOs != null &amp;&amp; loginOs != ''">
+		AND LOGIN_OS = #{loginOs}
+		</if>
+		<if test ="loginBrower != null &amp;&amp; loginBrower != ''">
+		AND LOGIN_BROWER = #{loginBrower}
+		</if>
+	</delete>
+
+	<update id="update" parameterType="com.sinosoft.ap.system.loginmanage.domain.UserLoginLogEntity">
+		UPDATE APS_USER_LOGIN_LOG  
+		<trim prefix="SET" prefixOverrides=",">
+		<if test ="loginTime != null">
+		,LOGIN_TIME =#{loginTime}
+		</if>		
+		<if test ="loginUser != null &amp;&amp; loginUser != ''">
+		,LOGIN_USER =#{loginUser}
+		</if>		
+		<if test ="loginIp != null &amp;&amp; loginIp != ''">
+		,LOGIN_IP =#{loginIp}
+		</if>		
+		<if test ="loginOs != null &amp;&amp; loginOs != ''">
+		,LOGIN_OS =#{loginOs}
+		</if>		
+		<if test ="loginBrower != null &amp;&amp; loginBrower != ''">
+		,LOGIN_BROWER =#{loginBrower}
+		</if>	
+		</trim>
+		where 
+		USER_ID = #{userId}
+	</update>
+	
+    <select id="select" resultMap="baseMap" parameterType="com.sinosoft.ap.system.loginmanage.domain.UserLoginLogEntity">
+        SELECT <include refid="sql" /> from  APS_USER_LOGIN_LOG
+        WHERE
+        1=1
+		<if test ="userLoginLogId != null &amp;&amp; userLoginLogId != ''">
+		AND USER_LOGIN_LOG_ID =#{userLoginLogId}
+		</if>	
+		<if test ="userId != null &amp;&amp; userId != ''">
+		AND USER_ID =#{userId}
+		</if>	
+		<if test ="loginTime != null">
+		AND LOGIN_TIME =#{loginTime}
+		</if>	
+		<if test ="loginUser != null &amp;&amp; loginUser != ''">
+		AND LOGIN_USER =#{loginUser}
+		</if>	
+		<if test ="loginIp != null &amp;&amp; loginIp != ''">
+		AND LOGIN_IP =#{loginIp}
+		</if>	
+		<if test ="loginOs != null &amp;&amp; loginOs != ''">
+		AND LOGIN_OS =#{loginOs}
+		</if>	
+		<if test ="loginBrower != null &amp;&amp; loginBrower != ''">
+		AND LOGIN_BROWER =#{loginBrower}
+		</if>	
+    </select>
+</mapper>

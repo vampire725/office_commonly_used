@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.permissionrolerel.domain.PermissionOperationRelRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.permissionrolerel.domain.PermissionOperationRelEntity">
+	    <result column="OPERETION_ID" property="operetionId" />
+	    <result column="PERMISSION_ID" property="permissionId" />
+    </resultMap>
+
+    <sql id="sql">
+	    OPERETION_ID,
+	    PERMISSION_ID
+    </sql>
+
+	<insert id="insert" parameterType="com.sinosoft.ap.system.permissionrolerel.domain.PermissionOperationRelEntity">
+		INSERT INTO APS_PERMISSION_OPERATION_REL(<include refid="sql" />) VALUES
+		(
+	    #{operetionId},
+	    #{permissionId}
+		);
+	</insert>
+	
+	<insert id="saveList" parameterType="java.util.List">
+		INSERT INTO APS_PERMISSION_OPERATION_REL(<include refid="sql" />) VALUES
+        <foreach collection="list" item="item" separator=",">  
+		    (#{item.operetionId},
+		    #{item.permissionId})
+        </foreach>  
+	</insert>
+
+	<delete id="delete" parameterType="com.sinosoft.ap.system.permissionrolerel.domain.PermissionOperationRelEntity">
+		DELETE FROM APS_PERMISSION_OPERATION_REL 
+		WHERE
+		1=1
+		<if test ="operetionId != null">
+		AND OPERETION_ID = #{operetionId}
+		</if>
+		<if test ="permissionId != null">
+		AND PERMISSION_ID = #{permissionId}
+		</if>
+	</delete>
+
+	
+    <select id="select" resultMap="baseMap" parameterType="com.sinosoft.ap.system.permissionrolerel.domain.PermissionOperationRelEntity">
+        SELECT <include refid="sql" /> from  APS_PERMISSION_OPERATION_REL
+        WHERE
+        1=1
+		<if test ="operetionId != null">
+		AND OPERETION_ID =#{operetionId}
+		</if>	
+		<if test ="permissionId != null">
+		AND PERMISSION_ID =#{permissionId}
+		</if>	
+    </select>
+</mapper>

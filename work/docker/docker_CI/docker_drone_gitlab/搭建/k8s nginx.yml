@@ -1,0 +1,42 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  revisionHistoryLimit: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      imagePullSecrets:
+        - name: dc-hspfd
+      containers:
+      # 应用的镜像
+      - image: nginx
+        name: nginx
+        imagePullPolicy: IfNotPresent
+        # 应用的内部端口
+        ports:
+        - containerPort: 80
+          name: nginx80
+        # 持久化挂接位置，在docker中      
+        volumeMounts:
+        - mountPath: /usr/share/nginx/html
+          name: nginx-data
+        - mountPath: /etc/nginx
+          name: nginx-conf
+      volumes:
+      # 宿主机上的目录
+      - name: nginx-data
+        nfs:
+          path: /k8s-nfs/nginx
+          server: 192.168.8.150
+      - name: nginx-conf
+        nfs:
+          path: /k8s-nfs/nginx/conf
+          server: 192.168.8.150

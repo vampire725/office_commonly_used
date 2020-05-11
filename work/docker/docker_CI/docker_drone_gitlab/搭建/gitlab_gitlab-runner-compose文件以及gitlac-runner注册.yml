@@ -1,0 +1,262 @@
+# 提前创建好文件，gitlab和gitlab CI,还没试成功过
+version: "3.6"
+services:
+  gitlab:
+    image: 60.28.140.210:10167/gitlab/gitlab-ce:latest
+      - "2289:22"
+      - "8172:10522"
+      - "445:443"
+    volumes:
+      - /opt/drone_test/gitlab/config:/etc/gitlab
+      - /opt/drone_test/gitlab/logs:/var/log/gitlab
+      - /opt/drone_test/gitlab/data:/var/opt/gitlab
+    environment:
+      GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
+    configs:
+      - source: omnibus_config.rb
+        target: /omnibus_config.rb
+    secrets:
+      - gitlab_root_password
+    networks:
+      - git_test
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      mode: replicated
+      replicas: 1
+
+  gitlab_runner:
+    image: 60.28.140.210:10167/gitlab/gitlab-runner:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/gitlab-runner/config:/etc/gitlab-runner
+    depends_on:
+      - "gitlab"
+    networks:
+      - git_test
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      mode: replicated
+      replicas: 1
+
+configs:
+  omnibus_config.rb:
+    external: true
+
+secrets:
+  gitlab_root_password:
+    external: true
+
+networks:
+    git_test:
+      driver: overlay
+
+
+
+
+
+# gitlab单独部署
+version: "3.6"
+services:
+  gitlab:
+    image: 60.28.140.210:10167/gitlab/gitlab-ce:8.17.3-ce.0
+    ports:
+      - "2289:22"
+      - "8172:10522"
+      - "445:443"
+    volumes:
+      - /home/sdb/gitlab/config:/etc/gitlab
+      - /home/sdb/gitlab/logs:/var/log/gitlab
+      - /home/sdb/gitlab/data:/var/opt/gitlab
+    environment:
+      GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
+    configs:
+      - source: omnibus_config.rb
+        target: /omnibus_config.rb
+    secrets:
+      - gitlab_root_password
+    networks:
+      - network1
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      mode: replicated
+      replicas: 1
+configs:
+  omnibus_config.rb:
+    external: true
+secrets:
+  gitlab_root_password:
+    external: true
+networks:
+    drone_test_net:
+      driver: overlay
+
+
+
+
+# gitlab以及gitlab CI 一块部署，自动创建相关文件
+version: "3.6"
+services:
+  gitlab:
+    image: 60.28.140.210:10167/gitlab/gitlab-ce:latest
+    ports:
+      - "26:22"
+      - "8083:10163"
+      - "443:443"
+    volumes:
+      - /opt/drone_test/gitlab/config:/etc/gitlab
+      - /opt/drone_test/gitlab/logs:/var/log/gitlab
+      - /opt/drone_test/gitlab/data:/var/opt/gitlab
+    environment:
+      GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
+    configs:
+      - source: gitlab
+        target: /omnibus_config.rb
+    secrets:
+      - gitlab_root_password
+    networks:
+      - drone_test_net
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      mode: replicated
+      replicas: 1
+  gitlab_runner:
+    image: 60.28.140.210:10167/gitlab/gitlab-runner:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/gitlab-runner/config:/etc/gitlab-runner
+    depends_on:
+      - "gitlab"
+    networks:
+      - drone_test_net
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      mode: replicated
+      replicas: 1
+configs:
+  gitlab:
+    file: /opt/drone_test/gitlab/gitlab.rb
+secrets:
+  gitlab_root_password:
+    file: /opt/drone_test/gitlab/root_password.txt
+networks:
+    drone_test_net:
+      driver: overlay
+
+
+# 部署完成以后，开始注册gitlab-runner01
+注册runner之前，先去gitlab创建项目，然后项目settings找到CICD。再找到runners扩展之类，获取url和token
+
+```bash
+root@9a7d03e2fefd:/# gitlab-ci-multi-runner register # 注册命令
+Runtime platform                                    arch=amd64 os=linux pid=34 revision=de7731dd version=12.1.0
+Running in system-mode.
+
+Please enter the gitlab-ci coordinator URL (e.g. https://gitlab.com/):
+http://60.28.140.210:10163/ # 填写在gitlab获取的url
+Please enter the gitlab-ci token for this runner:
+n5AvLiFmz79GDMvQcMvH # 写在gitlab获取的token
+Please enter the gitlab-ci description for this runner:
+[9a7d03e2fefd]: test test-project runner  # 描述这个runner
+Please enter the gitlab-ci tags for this runner (comma separated):
+docker,test  # 可以触发构建的tag
+Registering runner... succeeded                     runner=n5AvLiFm
+Please enter the executor: shell, docker-ssh+machine, kubernetes, docker+machine, custom, docker, docker-ssh, parallels, ssh, virtualbox:
+docker # 好像是执行器之类啥的
+Please enter the default Docker image (e.g. ruby:2.6):
+docker:18.09.0 # 我就随便写了一下，，，，
+Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded!
+root@9a7d03e2fefd:/# gitlab-ci-multi-runner list # 查看构建成功的runner列表
+Runtime platform                                    arch=amd64 os=linux pid=45 revision=de7731dd version=12.1.0
+Listing configured runners                          ConfigFile=/etc/gitlab-runner/config.toml
+test test-project runner                            Executor=docker Token=w_AjCrJ8xbU7YG_9yWLK URL=http://60.28.140.210:10163/
+root@9a7d03e2fefd:/# gitlab-ci-multi-runner list
+Runtime platform                                    arch=amd64 os=linux pid=53 revision=de7731dd version=12.1.0
+Listing configured runners                          ConfigFile=/etc/gitlab-runner/config.toml
+test test-project runner                            Executor=docker Token=w_AjCrJ8xbU7YG_9yWLK URL=http://60.28.140.210:10163/
+
+```
+
+# 进入容器，用命令注册gitlab-runner02
+```bash
+sudo gitlab-runner register \
+  --non-interactive \
+  --url "http://111.33.152.130:2525/" \
+  --registration-token "cCnyV3zFnkJr24jdzuZ_" \
+  --executor "docker" \
+  --docker-image docker:18.09 \
+  --docker-volumes /var/run/docker.sock:/var/run/docker.sock
+  --description "bala group" \
+  --run-untagged="true" \
+  --locked="false" \
+  --access-level="not_protected"
+```
+
+# .gitlab-ci.yml
+```yml
+image: docker:18.09-git
+services:
+    - docker:18.09-dind
+variables:
+  DOCKER_DRIVER: overlay2
+  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
+
+stages:
+  - build_image
+  - test
+  - release
+  - rmi_image
+
+before_script:
+  - export IMAGE_TEST_TAG=$(git describe --tags)
+  - export CONTAINER_TEST_IMAGE=$CI_REGISTRY_IMAGE:$IMAGE_TEST_TAG
+  - echo $CONTAINER_TEST_IMAGE
+  - mkdir -p /etc/docker/certs.d/$CI_REGISTRY
+  - cp domain.crt /etc/docker/certs.d/$CI_REGISTRY/ca.crt
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+build_image:
+  stage: build_image
+  script:
+    - docker build -t $CONTAINER_TEST_IMAGE .
+
+unit_test:
+  stage: test
+  except:
+  - master
+  - pre-production
+  - production
+  script:
+    - docker run -t  --name unit_test-$IMAGE_TEST_TAG  $CONTAINER_TEST_IMAGE python t.py
+
+integrated_test:
+  stage: test
+  only:
+  - master
+  - pre-production
+  script:
+    - docker run -it -d --name integrated_test-$IMAGE_TEST_TAG $CONTAINER_TEST_IMAGE
+    - docker logs integrated_test-$IMAGE_TEST_TAG >& container_logs/$IMAGE_TEST_TAG.log
+    - docker rm -f integrated_test-$IMAGE_TEST_TAG
+
+release-image:
+  stage: release
+  only:
+    - pre-production
+    - production
+  script:
+    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
+    - docker push $CONTAINER_RELEASE_IMAGE
+
+
+rmi_image:
+  stage: rmi_image
+  script:
+    - docker rmi -f $CONTAINER_TEST_IMAGE
+
+
+

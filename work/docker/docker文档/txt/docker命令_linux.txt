@@ -1,0 +1,77 @@
+# 查看容器IP命令 
+docker inspect --format '{{.NetworkSettings.IPAddress}}' a1ab3708d5bd
+
+docker inspect --format '{{.State.Status}}' gitlab02
+
+# 清理docker相关命令
+docker stop $(docker ps -q) # 停用全部容器
+docker rm $(docker ps -aq)  # 删除所有容器
+docker stop $(docker ps -q) & docker rm $(docker ps -aq)  # 停用并删除所有容器
+docker exec  gifted_ardinghelli ls /usr/local/kafka   #查看容器内文件
+docker system prune命令可以用于清理磁盘，删除关闭的容器、无用的数据卷和网络，以及 dangling 镜像(即无 tag 的镜像)
+docker system prune -a命令清理得更加彻底，可以将没有容器使用 Docker 镜像都删掉。
+docker ps -a | grep Exit | cut -d ' ' -f 1 | xargs docker rm   删除所有关闭的容器
+docker rmi $(docker images | grep "^<none>" | awk "{print $3}")  删除所有 dangling 镜像(即无 tag 的镜像)：
+docker volume rm $(docker volume ls -qf dangling=true)   删除所有 dangling 数据卷(即无用的 volume)：
+
+# 查看端口
+lsof -i:
+
+# 新型的docker-compose编写形式，docker stack 部署命令
+docker stack deploy --compose-file docker-compose.yml git  
+
+
+
+# 从容器拷贝文件到宿主机
+docker cp ca49c691cb92:/var/opt/gitlab/backups/1563354053_2019_07_17_gitlab_backup.tar ./
+
+# 从宿主机拷贝文件到容器
+docker cp /opt/test/file.txt mycontainer:/var/opt/gitlab/backups/
+
+# 跨主机复制文件（本地文件复制到远程）
+scp -P 10122 ./1563354053_2019_07_17_gitlab_backup.tar root@60.28.140.210:/opt/drone_test/gitlab/data/backups/
+
+# 跨主机复制文件（远程文件复制到本地）
+scp -P 10122 root@60.28.140.210:/root/1563353385_2019_07_17_gitlab_backup.tar ./
+
+
+
+# centos下docker添加源并更新升级
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum-config-manager --enable docker-ce-edge
+yum-config-manager --enable docker-ce-testing
+yum-config-manager --disable docker-ce-edge
+yum makecache fast
+yum install docker-ce
+
+# 镜像拉不下来
+
+docker pull quay.azk8s.cn/jetstack/cert-manager-cainjector:v0.9.1
+docker pull quay.azk8s.cn/jetstack/cert-manager-controller:v0.9.1
+docker pull quay.azk8s.cn/jetstack/cert-manager-webhook:v0.9.1
+
+docker tag quay.azk8s.cn/jetstack/cert-manager-cainjector:v0.9.1 quay.io/jetstack/cert-manager-cainjector:v0.9.1
+docker tag quay.azk8s.cn/jetstack/cert-manager-controller:v0.9.1 quay.io/jetstack/cert-manager-controller:v0.9.1
+docker tag quay.azk8s.cn/jetstack/cert-manager-webhook:v0.9.1 quay.io/jetstack/cert-manager-webhook:v0.9.1
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+

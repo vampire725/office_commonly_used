@@ -1,0 +1,4 @@
+export PYTHONPATH= 
+pytest pytest-cov pytest-pep8 pytest-flakes pytest-mock
+
+python -m pytest --cov=src/ --pep8 --flakes tests/

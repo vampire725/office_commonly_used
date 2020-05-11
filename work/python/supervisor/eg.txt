@@ -1,0 +1,21 @@
+[program:gremlin_server]
+command=/usr/local/janusgraph0.2/bin/gremlin-server.sh  /usr/local/janusgraph0.2/conf/gremlin-server/socket-gremlin-server.yaml
+;numprocs=1
+;process_name=%(program_name)s
+user=root
+autorestart=true
+redirect_stderr=true
+stdout_logfile = /var/log/supervisor/gremlin_socket.log
+loglevel=warn
+
+
+[program:gremlin_server]
+command=/usr/local/janusgraph0.2/bin/gremlin-server.sh  /usr/local/janusgraph0.2/conf/gremlin-server/socket-gremlin-server.yaml
+user=root
+directory=/usr/local/janusgraph0.2
+startsecs=10
+stopwaitsecs=5
+autostart=false
+autorestart=true
+stdout_logfile=/var/log/supervisor/gremlin_socket.log
+stderr_logfile=/var/log/supervisor/gremlin_socket.err

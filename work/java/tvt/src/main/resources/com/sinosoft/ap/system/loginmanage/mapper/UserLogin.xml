@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.loginmanage.domain.UserLoginRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.loginmanage.domain.UserLoginEntity">
+	    <result column="USER_ID" property="userId" />
+	    <result column="USER_PASSWORD" property="userPassword" />
+	    <result column="USER_TELNUMBER" property="userTelnumber" />
+	    <result column="USER_ID_CODE" property="userIdCode" />
+	    <result column="USER_ACCOUNT" property="userAccount" />
+	    <result column="USER_MAIL" property="userMail" />
+    </resultMap>
+    <resultMap id="permissionMap" type="com.sinosoft.ap.system.permissionmanage.domain.PermissionEntity">
+	    <result column="PERMISSION_ID" property="permissionId" />
+	    <result column="PERMISSION_CODE" property="permissionCode" />
+	    <result column="PERMISSION_CREATETIME" property="permissionCreatetime" />
+	    <result column="PERMISSION_NAME" property="permissionName" />
+	    <result column="PERMISSION_DESC" property="permissionDesc" />
+		<result column="PERMISSION_TYPE" property="permissionType" />
+		<result column="PERMISSION_STATUS" property="permissionStatus" />
+		<result column="PERMISSION_SYMBOL" property="permissionSymbol" />
+		<result column="PERMISSION_ENTRYUSER" property="permissionEntryuser" />
+		<result column="PERMISSION_DESTROYTIME" property="permissionDestroytime" />
+		<result column="PERMISSION_REASON" property="permissionReason" />
+		<result column="PERMISSION_REASON" property="permissionReason" />
+		<result column="RESOURCE_ID" property="resourceId" />
+    </resultMap>
+    <sql id="sql">
+	    USER_ID,
+	    USER_PASSWORD,
+	    USER_TELNUMBER,
+	    USER_ID_CODE,
+	    USER_ACCOUNT,
+	    USER_MAIL
+    </sql>
+	
+    <select id="select" resultMap="baseMap" parameterType="com.sinosoft.ap.system.loginmanage.domain.UserLoginEntity">
+        SELECT <include refid="sql" /> from  V_USER_LOGIN
+        WHERE
+        1=1
+		<if test ="userId != null &amp;&amp; userId != '' ">
+		AND USER_ID = #{userId}
+		</if>	
+		<if test ="userPassword != null &amp;&amp; userPassword != ''">
+		AND USER_PASSWORD = #{userPassword}
+		</if>	
+		<if test ="userTelnumber != null &amp;&amp; userTelnumber != ''">
+		AND USER_TELNUMBER = #{userTelnumber}
+		</if>	
+		<if test ="userIdCode != null &amp;&amp; userIdCode != '' ">
+		AND USER_ID_CODE = #{userIdCode}
+		</if>	
+		<if test ="userAccount != null &amp;&amp; userAccount != ''">
+		AND USER_ACCOUNT = #{userAccount}
+		</if>	
+		<if test ="userMail != null &amp;&amp; userMail != ''">
+		AND USER_MAIL = #{userMail}
+		</if>	
+    </select>
+      
+    <select id="selectUserOrganPermission" resultMap="permissionMap" parameterType="string">
+    SELECT A.*,R.RESOURCE_ID
+	FROM APS_PERMISSION AS A
+	JOIN APS_PERMISSION_ORGAN_REL AS B ON A.PERMISSION_ID = B.PERMISSION_ID
+	JOIN APS_USER_ORGANIZATION_REL AS C 
+	ON FIND_IN_SET(B.ORGAN_ID,getParentList(C.ORGAN_ID))
+	left join APS_PERMISSION_RESOURCE_REL R
+	on R.PERMISSION_ID=A.PERMISSION_ID
+	WHERE C.USER_ID = #{_parameter}
+	ORDER BY A.PERMISSION_CREATETIME
+    </select>
+    
+    <select id="selectUserOwnPermission" resultMap="permissionMap" parameterType="string">
+	SELECT A.* 
+	FROM APS_PERMISSION AS A
+	JOIN APS_USER_PERMISSION_REL AS B ON B.PERMISSION_ID = A.PERMISSION_ID
+	WHERE 
+	B.USER_ID = #{_parameter}
+	ORDER BY A.PERMISSION_CREATETIME
+    </select>
+    
+    <select id="selectUserRolePermission" resultMap="permissionMap" parameterType="string">
+	SELECT A.* ,R.RESOURCE_ID
+	FROM APS_PERMISSION AS A
+	JOIN APS_PERMISSION_ROLE_REL AS C ON C.PERMISSION_ID = A.PERMISSION_ID
+	JOIN APS_USER_ROLE_REL AS D ON D.ROLE_ID = C.ROLE_ID
+	left join APS_PERMISSION_RESOURCE_REL R
+	on R.PERMISSION_ID=A.PERMISSION_ID
+	WHERE 
+	D.USER_ID = #{_parameter}
+	ORDER BY A.PERMISSION_CREATETIME
+    </select>
+
+</mapper>

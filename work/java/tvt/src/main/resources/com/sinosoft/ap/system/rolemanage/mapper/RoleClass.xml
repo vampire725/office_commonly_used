@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.rolemanage.domain.RoleClassRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.rolemanage.domain.RoleEntity">
+	    <result column="ROLE_ID" property="roleId" />
+	    <result column="ROLE_DESC" property="roleDesc" />
+	    <result column="ROLE_CREATETIME" property="roleCreatetime" />
+	    <result column="ROLE_NAME" property="roleName" />
+	    <result column="ROLE_CODE" property="roleCode" />
+    </resultMap>
+
+    <sql id="sql">
+	    ROLE_ID,
+	    ROLE_DESC,
+	    ROLE_CREATETIME,
+	    ROLE_NAME,
+	    ROLE_CODE
+    </sql>
+
+	<insert id="insert" parameterType="com.sinosoft.ap.system.rolemanage.domain.RoleClassEntity">
+		INSERT INTO APS_ROLE_CLASS_REL(CLASS_ID,ROLE_ID) VALUES
+        <foreach collection="roleId" item="item" separator=",">  
+		    (#{classId},
+		    #{item})
+        </foreach> 
+	</insert>
+
+	<delete id="deleteByRoles" parameterType="java.util.List">
+		DELETE FROM APS_ROLE_CLASS_REL 
+		WHERE
+		ROLE_ID IN (
+		<foreach collection="list" item="item" separator=",">  
+		    #{item}
+        </foreach> 
+        )
+	</delete>
+
+	<delete id="deleteByRole" parameterType="java.lang.String">
+		DELETE FROM APS_ROLE_CLASS_REL 
+		WHERE
+		ROLE_ID = #{_parameter}
+	</delete>
+	
+	<delete id="deleteByClass" parameterType="java.lang.String">
+		DELETE FROM APS_ROLE_CLASS_REL 
+		WHERE
+		CLASS_ID = #{_parameter}
+	</delete>
+	
+    <select id="select" resultMap="baseMap" parameterType="java.lang.String">
+        SELECT APS_ROLE.* from  APS_ROLE
+        LEFT JOIN APS_ROLE_CLASS_REL ON APS_ROLE.ROLE_ID = APS_ROLE_CLASS_REL.ROLE_ID
+        WHERE
+        APS_ROLE_CLASS_REL.CLASS_ID = #{_parameter}
+    </select>
+    
+    <select id="selectByName" resultMap="baseMap" parameterType="java.lang.String">
+        SELECT * from  APS_ROLE AS A
+        WHERE
+        A.ROLE_NAME = #{_parameter}
+    </select>
+    
+    <select id="selectUserRole" resultMap="baseMap" parameterType="java.lang.String">
+        SELECT A.* from  APS_ROLE AS A
+        LEFT join APS_USER_ROLE_REL as B on A.ROLE_ID = B.ROLE_ID
+        WHERE
+        B.USER_ID = #{_parameter}
+    </select>
+    
+    <select id="selectLike" resultMap="baseMap" parameterType="java.lang.String">
+        SELECT <include refid="sql" /> from  APS_ROLE
+        WHERE
+        APS_ROLE.ROLE_NAME LIKE #{_parameter}
+    </select>
+</mapper>

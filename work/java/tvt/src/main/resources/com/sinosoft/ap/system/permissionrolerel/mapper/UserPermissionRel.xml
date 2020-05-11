@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.permissionrolerel.domain.UserPermissionRelRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.permissionrolerel.domain.UserPermissionRelEntity">
+	    <result column="USER_ID" property="userId" />
+	    <result column="PERMISSION_ID" property="permissionId" />
+    </resultMap>
+
+    <sql id="sql">
+	    USER_ID,
+	    PERMISSION_ID
+    </sql>
+
+	<insert id="insert" parameterType="com.sinosoft.ap.system.permissionrolerel.domain.UserPermissionRelEntity">
+		INSERT INTO APS_USER_PERMISSION_REL(<include refid="sql" />) VALUES
+		(
+	    #{userId},
+	    #{permissionId}
+		);
+	</insert>
+
+	<delete id="delete" parameterType="com.sinosoft.ap.system.permissionrolerel.domain.UserPermissionRelEntity">
+		DELETE FROM APS_USER_PERMISSION_REL 
+		WHERE
+		1=1
+		<if test ="userId != null">
+		AND USER_ID = #{userId}
+		</if>
+		<if test ="permissionId != null">
+		AND PERMISSION_ID = #{permissionId}
+		</if>
+	</delete>
+
+	
+    <select id="select" resultMap="baseMap" parameterType="com.sinosoft.ap.system.permissionrolerel.domain.UserPermissionRelEntity">
+        SELECT <include refid="sql" /> from  APS_USER_PERMISSION_REL
+        WHERE
+        1=1
+		<if test ="userId != null">
+		AND USER_ID =#{userId}
+		</if>	
+		<if test ="permissionId != null">
+		AND PERMISSION_ID =#{permissionId}
+		</if>	
+    </select>
+</mapper>

@@ -1,0 +1,89 @@
+version: "3.6"
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    ports:
+      - "26:22"
+      - "9999:10623"
+      - "443:443"
+    volumes:
+      - /opt/gitlab/config:/etc/gitlab
+      - /opt/gitlab/logs:/var/log/gitlab
+      - /opt/gitlab/data:/var/opt/gitlab
+    environment:
+      GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
+    configs:
+      - source: gitlab
+        target: /omnibus_config.rb
+    secrets:
+      - gitlab_root_password
+    networks:
+      - drone_test_net
+    deploy:
+      placement:
+        constraints: [node.hostname == newnode15]
+      mode: replicated
+      replicas: 1
+  gitlab_runner:
+    image: gitlab/gitlab-runner:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/gitlab-runner/config:/etc/gitlab-runner
+    depends_on:
+      - "gitlab"
+    networks:
+      - drone_test_net
+    deploy:
+      placement:
+        constraints: [node.hostname == newnode15]
+      mode: replicated
+      replicas: 1
+configs:
+  gitlab:
+    file: /opt/gitlab/secret/gitlab.rb
+secrets:
+  gitlab_root_password:
+    file: /opt/gitlab/secret/root_password.txt
+networks:
+    drone_test_net:
+      driver: overlay
+  docker run --detach \
+    --env GITLAB_OMNIBUS_CONFIG="external_url 'http://111.33.152.130:10163/'; gitlab_rails['lfs_enabled'] = true; gitlab_rails['gitlab_shell_ssh_port'] = 2526" \
+    --publish 2525:10163 \
+    --publish 2526:22 \
+    --name gitlab \
+    --restart always \
+    --volume /opt/gitlab/config:/etc/gitlab \
+    --volume /opt/gitlab/logs:/var/log/gitlab \
+    --volume /opt/gitlab/data:/var/opt/gitlab \
+    gitlab/gitlab-ce:8.17.3-ce.0
+
+  docker run -d --name gitlab-runner --restart always \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /opt/gitlab/gitlab-runner/config:/etc/gitlab-runner:Z \
+  gitlab/gitlab-runner:latest
+
+
+docker run --detach \
+--env GITLAB_OMNIBUS_CONFIG="external_url '111.33.152.130:10163/'; gitlab_rails['lfs_enabled'] = true;" \
+--publish 2525:10163 \
+--name gitlab \
+--restart always \
+gitlab/gitlab-ce:8.17.3-ce.0
+
+http://111.33.152.130:10163/
+
+
+docker run --detach \
+--env GITLAB_OMNIBUS_CONFIG="external_url '111.33.152.130:10165/'; gitlab_rails['lfs_enabled'] = true;" \
+--publish 8085:10165 \
+--name gitlab02 \
+--restart always \
+gitlab/gitlab-ce:11.3.5-ce.0
+
+
+docker run --detach \
+--env GITLAB_OMNIBUS_CONFIG="external_url '10.20.10.100:8888/'; gitlab_rails['lfs_enabled'] = true;" \
+--publish 8085:8888 \
+--name gitlab03 \
+gitlab/gitlab-ce:11.3.5-ce.0

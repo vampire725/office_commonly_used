@@ -1,0 +1,54 @@
+echo更新
+
+1. api
+2. 代理信息展示grafana，exporter
+3. 调用接口或写脚本（研究grafana和Prometheus用法） 
+
+
+curl -X PUT -d '{"id": "v2ray-exporter-2","name": "v2ray-exporter-192.255.198.11","address": "192.255.198.11","port": 9500,"tags": [""],"checks": [{"http": "http://192.255.198.11:9500/metrics", "interval": "5s"}]}'  http://192.168.129.120:31473/v1/agent/service/register
+
+curl -X PUT -d '{"id": "v2ray-exporter","name": "v2ray-exporter-192.255.198.11","address": "192.255.198.11","port": 9500,"tags": ["test"],"checks": [{"http": "http://192.255.198.11:9500/scrape", "interval": "5s"}]}'  http://192.168.129.120:31473/v1/agent/service/register
+
+
+http://192.255.198.11:9500/scrape
+http://192.255.198.11:9550/scrape
+
+docker run  -d \
+  -p 8893:9090 \
+  -v /opt/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml  \
+  prom/prometheus
+
+docker run -d \
+  -p 8891:3000 \
+  --name=grafana \
+  -v /opt/grafana-storage:/var/lib/grafana \
+  grafana/grafana
+
+
+明日计划：
+
+1. 测试一键安装脚本
+2. 写入console配置文件
+3. 发送console
+4. 发送数据到echo接口
+5. 中转服务器要计划一下
+
+
+1. 模板
+2. echo对接妖怪接口，安装部署，
+3. echo：
+    - yokai:
+        - yokai.sh
+        - yokai_templete
+4. host流量上限
+5. proxy流量信息
+6. host方法增加banwidth接口，
+    1. 存库
+    2. 通知普鲁米修斯，设置流量上线，为了以后预警功能
+
+
+1. 重新规划代理项目，确定技术选型/实现功能细节等
+2. 实现访问Echo相关接口，对接yokai脚本实现一键安装/配置/启动等功能
+3. 深入研究使用Prometheus
+
+

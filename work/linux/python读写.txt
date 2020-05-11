@@ -1,0 +1,16 @@
+#  持续添加内容到文件
+
+def add_proxy(data):
+    try:
+        with open('app/url_file/proxy_information.txt', 'a', encoding='utf-8')as f:
+            f.write(data + '\n')
+        return {"errCode": 0, "errMsg": "存储成功"}
+    except Exception:
+        return {"errCode": 404, "errMsg": "发生未知错误"}
+
+# python write和writelines的区别
+
+
+file.write(str)的参数是一个字符串，就是你要写入文件的内容.
+file.writelines(sequence)的参数是序列，比如列表，它会迭代帮你写入文件。
+

@@ -1,0 +1,33 @@
+# rancher-pipeline.yml文件模板
+stages: # 阶段
+- name: test  # 阶段——测试
+  steps:  # 步骤
+  - runScriptConfig:  # 脚本配置
+      image: $CICD_REGISTRY/$TEST_IMAGE_NAME:$TEST_IMAGE_TAG  # 测试阶段所需的基础镜像，$镜像仓库地址/$测试镜像名字:$镜像版本
+      shellScript: python -m pytest tests/  # 测试命令/脚本
+    when: # 运行脚本触发条件  当分支为master时运行脚本
+      branch:
+        include:
+        - master
+  when: # 阶段运行触发条件  当分支为master时运行此阶段
+    branch:
+      include:
+      - master
+- name: build # 阶段——构建
+  steps:
+  - publishImageConfig: # 构建并发布镜像配置
+      dockerfilePath: ./Dockerfile  # Dockerfile所在位置
+      buildContext: . # 构建上下文
+      tag: ${CICD_GIT_REPO_NAME}:${CICD_EXECUTION_SEQUENCE} # 镜像名字，$项目名称:$CICD执行序列号
+      pushRemote: true  # 是否发布到远程镜像
+      registry: $CICD_REGISTRY  # 镜像发布的远程仓库地址
+    env:
+      PLUGIN_INSECURE: "true" # 使用私有仓库
+- name: deploy  # 阶段——部署
+  steps:
+  - applyYamlConfig:  # 部署服务配置
+      path: ./deployment.yaml # 部署服务到k8s环境中所需的部署文件
+  when: # 部署条件
+    branch: {}
+timeout: 120
+notification: {}

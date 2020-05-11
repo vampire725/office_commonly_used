@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.userorganizationrel.domain.UserOrganizationRelRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.userorganizationrel.domain.UserOrganizationRelEntity">
+	    <result column="ORGAN_ID" property="organId" />
+	    <result column="USER_ID" property="userId" />
+    </resultMap>
+
+    <sql id="sql">
+	    ORGAN_ID,
+	    USER_ID
+    </sql>
+
+	<insert id="insert" parameterType="com.sinosoft.ap.system.userorganizationrel.domain.UserOrganizationRelEntity">
+		INSERT INTO APS_USER_ORGANIZATION_REL(<include refid="sql" />) VALUES
+		(
+	    #{organId},
+	    #{userId}
+		);
+	</insert>
+
+	<delete id="delete" parameterType="com.sinosoft.ap.system.userorganizationrel.domain.UserOrganizationRelEntity">
+		DELETE FROM APS_USER_ORGANIZATION_REL 
+		WHERE
+		1=1
+		<if test ="organId != null">
+		AND ORGAN_ID = #{organId}
+		</if>
+		<if test ="userId != null">
+		AND USER_ID = #{userId}
+		</if>
+	</delete>
+
+
+	
+    <select id="select" resultMap="baseMap" parameterType="com.sinosoft.ap.system.userorganizationrel.domain.UserOrganizationRelEntity">
+        SELECT <include refid="sql" /> from  APS_USER_ORGANIZATION_REL
+        WHERE
+        1=1
+		<if test ="organId != null">
+		AND ORGAN_ID =#{organId}
+		</if>	
+		<if test ="userId != null">
+		AND USER_ID =#{userId}
+		</if>	
+    </select>
+</mapper>

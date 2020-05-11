@@ -1,0 +1,60 @@
+NEW_USER=rancher
+sudo adduser $NEW_USER
+echo rancher | sudo passwd $NEW_USER --stdin
+sudo echo "$NEW_USER ALL=(ALL) ALL" >> /etc/sudoers
+sudo yum remove docker \
+docker-client \
+docker-client-latest \
+docker-common \
+docker-latest \
+docker-latest-logrotate \
+docker-logrotate \
+docker-selinux \
+docker-engine-selinux \
+docker-engine \
+container*
+sudo yum install -y yum-utils device-mapper-persistent-data  lvm2 bashcompletion
+sudo yum-config-manager --add-repo \
+http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo;
+yum list docker-ce --showduplicates | sort -r
+sudo yum -y install docker-ce-19.03.7-3.el7  docker-ce-cli-19.03.7-3.el7 containerd.io
+sudo usermod -aG docker $NEW_USER;
+sudo systemctl enable --now docker;
+
+
+sudo tee /etc/docker/daemon.json <<-'EOF' 
+{
+    "max-concurrent-downloads": 3,
+    "max-concurrent-uploads": 5,
+    "storage-driver": "overlay2",
+    "storage-opts": [
+        "overlay2.override_kernel_check=true"
+    ],
+    "log-driver": "json-file",
+    "log-opts": {
+        "max-size": "100m",
+        "max-file": "3"
+    }
+}
+EOF
+
+systemctl restart docker
+
+yum -y install yum-plugin-versionlock
+yum versionlock add docker-ce-18.09.9-3.el7 docker-ce-cli-18.09.9-3.el7 containerd.io
+yum versionlock list
+
+cat >> /etc/sysctl.d/kubernetes.conf<<EOF 
+net.ipv4.ip_forward=1
+kernel.watchdog_thresh=30 
+net.bridge.bridge-nf-call-iptables=1
+net.ipv4.neigh.default.gc_thresh1=4096 
+net.ipv4.neigh.default.gc_thresh2=6144 
+net.ipv4.neigh.default.gc_thresh3=8192 
+EOF
+
+sysctl -p && systemctl restart docker
+
+su - rancher 
+ssh-keygen -t rsa
+ 

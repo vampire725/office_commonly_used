@@ -1,0 +1,42 @@
+sudo gitlab-runner register \
+  --non-interactive \
+  --url "http://111.33.152.130:2525/" \
+  --registration-token "cCnyV3zFnkJr24jdzuZ_" \
+  --executor "docker" \
+  --docker-image docker:18.09 \
+  --docker-volumes /var/run/docker.sock:/var/run/docker.sock
+  --description "bala group" \
+  --run-untagged="true" \
+  --locked="false" \
+  --access-level="not_protected"
+
+
+```bash
+root@9a7d03e2fefd:/# gitlab-ci-multi-runner register # 注册命令
+Runtime platform                                    arch=amd64 os=linux pid=34 revision=de7731dd version=12.1.0
+Running in system-mode.
+
+Please enter the gitlab-ci coordinator URL (e.g. https://gitlab.com/):
+http://60.28.140.210:10163/ # 填写在gitlab获取的url
+Please enter the gitlab-ci token for this runner:
+n5AvLiFmz79GDMvQcMvH # 写在gitlab获取的token
+Please enter the gitlab-ci description for this runner:
+[9a7d03e2fefd]: test test-project runner  # 描述这个runner
+Please enter the gitlab-ci tags for this runner (comma separated):
+docker,test  # 可以触发构建的tag
+Registering runner... succeeded                     runner=n5AvLiFm
+Please enter the executor: shell, docker-ssh+machine, kubernetes, docker+machine, custom, docker, docker-ssh, parallels, ssh, virtualbox:
+docker # 好像是执行器之类啥的
+Please enter the default Docker image (e.g. ruby:2.6):
+docker:18.09.0 # 我就随便写了一下，，，，
+Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded!
+root@9a7d03e2fefd:/# gitlab-ci-multi-runner list # 查看构建成功的runner列表
+Runtime platform                                    arch=amd64 os=linux pid=45 revision=de7731dd version=12.1.0
+Listing configured runners                          ConfigFile=/etc/gitlab-runner/config.toml
+test test-project runner                            Executor=docker Token=w_AjCrJ8xbU7YG_9yWLK URL=http://60.28.140.210:10163/
+root@9a7d03e2fefd:/# gitlab-ci-multi-runner list
+Runtime platform                                    arch=amd64 os=linux pid=53 revision=de7731dd version=12.1.0
+Listing configured runners                          ConfigFile=/etc/gitlab-runner/config.toml
+test test-project runner                            Executor=docker Token=w_AjCrJ8xbU7YG_9yWLK URL=http://60.28.140.210:10163/
+
+```

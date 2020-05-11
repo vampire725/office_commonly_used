@@ -1,0 +1,79 @@
+---                                 # ---是分隔符，是可选的，在单一文件中，可用连续三个连字号---区分多个文件 
+apiVersion: v1                      # apiVersion，这里它的值是 v1，这个版本号需要根据我们安装的kubernetes版本和资源类型进行变化的 
+kind: Pod                           # kind，这里我们创建的是一个 Pod，当然根据你的实际情况，这里资源类型可以是 Deployment、Job、Ingress、Service 等
+metadata:                           # metadata：包含了我们定义的 Pod 的一些 meta 信息，比如名称、namespace、标签等等信息
+name: $POD-NAME                     # pod名字
+namespace: $POD_NAMESPACE           # 选择的命名空间 
+labels:                             # 标签
+    app: web                        # 部署服务类型
+spec:                               # spec：包括一些containers/storage/volumes设置的一些参数
+containers:
+    - name: $CONTAINER_NAME         # 容器名字
+      image: $CICD_REGISTRY/${CICD_GIT_REPO_NAME}:${CICD_EXECUTION_SEQUENCE}  # 生成容器所需的镜像名字，$镜像仓库/$项目名字:$镜像版本 
+      imagePullPolicy: IfNotPresent                                           # 获取镜像的策略 Alawys表示下载镜像 IfnotPresent表示优先使用本地镜像，                                                                            否则下载镜像，Nerver表示仅使用本地镜像 
+      resources:                    # 指定mem/cpu资源限制和资源请求 
+        limits:
+          memory: "200Mi"
+          cpu: "1"
+        requests:
+          memory: "100Mi"
+          cpu: "0.5"
+
+      env:                          # 通过环境变量的方式，直接传递pod=自定义Linux OS环境变量
+        - name: LOCAL_KEY           # 本地Key
+          value: value
+        - name: CONFIG_MAP_KEY      # local策略可使用configMap的配置Key
+          valueFrom:
+            configMapKeyRef:
+              name: special-config  # configmap中找到name为special-config
+              key: special.type     # 找到special-config里name为special.type的key
+
+      volumeMounts:                 # 挂载
+
+        - name: sdb                   
+          mountPath: /data/media  
+
+        - name: task-pv-storage
+          mountPath: /data/media    
+          
+        - mountPath: /data/media         
+          name: test-volume
+
+        - name: all-in-one
+          mountPath: /data/media
+          readOnly: true
+        
+        - name: config-vol
+          mountPath: /data/media
+
+                
+      ports: 
+          - containerPort: 5000                                                                                                                                                         
+volumes: 
+- name: sdb                         # 1. 普通Volume用法，该卷跟随容器销毁，挂载一个目录
+  emptyDir: {}
+
+- name: task-pv-storage             # 2. 高级用法第2中，挂载PVC(PresistentVolumeClaim)，pvc需要提前创建，参考(https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/)
+  persistentVolumeClaim:
+    claimName: task-pv-claim
+
+- name: test-volume                 # 3. hostPath，使用所在主机上的目录挂载到容器目录内
+  hostPath:                         
+    path: /data                     # 主机上的目录位置
+    type: Directory                 # 此字段可选，Directory表示在给定路径上存在主机目录必须存在。DirectoryOrCreate表示路径不存在则创建，具体参考(https://kubernetes.io/zh/docs/concepts/storage/volumes/) 
+
+- name: all-in-one                  # 4. 配置Pod以使用secret方式的卷进行挂载，secret需提前创建，可以挂载多个secret到容器指定目录下，参考(https://kubernetes.io/docs/tasks/configure-pod-container/configure-projected-volume-storage/)
+  projected:
+    sources:
+    - secret:
+        name: user
+    - secret:
+        name: pass
+
+- name: config-vol                  # 5. 使用ConfigMap类型进行挂载，具体参考(https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/)
+  configMap:
+    name: example-volume-config     # configmap中找到name为example-volume-config 
+    items:
+      - key: USER-KEY               # 找到example-volume-config里name为USER-KEY的key                                  
+        path: keys                  # 指定configmap里的key挂载到容器内，挂载成功后，容器内目录结构如下: /etc/config/keys  
+                    

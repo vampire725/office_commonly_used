@@ -1,0 +1,46 @@
+variables:
+  DOCKER_HOST: tcp://192.168.129.13:2376
+  DOCKER_DRIVER: overlay2
+  CI_REGISTRY_USER: admin
+  CI_REGISTRY_PASSWORD: asd1234
+  CI_REGISTRY: 10.20.10.100:8888
+stages:
+  - build_image
+  - push_image
+  - build_container
+  - rmi_image
+build_image:  
+  stage: build_image
+  tags:
+    - docker
+  script:
+    - cp domain.crt /etc/ssl/certs/ca-certificates.crt
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG .
+  only:
+    refs:
+      - master
+      - schedules
+    variables:
+      - RELEASE == 'staging'
+      - STAGING
+  
+push_image:
+  stage: push_image
+  tags:
+    - docker
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+build_container:
+  stage: build_container
+  tags:
+    - docker
+  script:
+    - docker run -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+rmi_image:
+  stage: rmi_image
+  tags:
+    - docker
+  script:
+    - docker rmi -f $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG

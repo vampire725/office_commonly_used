@@ -1,0 +1,15 @@
+10.10.30.131-140 kafka集群
+user：wor
+passwd: sinosoft@123
+
+60.28.140.210:10122   root/P@ssw0rd#208 10.20.10.208
+10.10.20.8  root  Sxt26*h3  python  Xst37%9k
+10.10.20.11  root  cm5bjkMT  python  5rwTNSp7
+10.10.20.9 root:y7kW9SKx  python:pgIUB9sG
+root@newnode10 P@ssw0rd#123   192.168.129.10
+work@10.10.40.5 -p 22    P@ssw0rd#208
+10.10.40.5  root JFkng4Pn    work  QdmDMdcEcm
+S
+
+# 天津端口映射文件
+https://1drv.ms/x/s!Ah_ERAs2VkpJgZQ3tMubx9lGOwFsnA   

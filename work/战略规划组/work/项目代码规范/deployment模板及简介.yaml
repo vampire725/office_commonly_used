@@ -1,0 +1,14 @@
+---               # ---是分隔符，是可选的，在单一文件中，可用连续三个连字号---区分多个文件。
+apiVersion: v1    # apiVersion，这里它的值是 v1，这个版本号需要根据我们安装的kubernetes版本和资源类型进行变化的。
+kind: Pod         # kind，这里我们创建的是一个 Pod，当然根据你的实际情况，这里资源类型可以是 Deployment、Job、Ingress、Service 等待。
+metadata:         # metadata：包含了我们定义的 Pod 的一些 meta 信息，比如名称、namespace、标签等等信息。
+  name: $POD-NAME   # pod名字 
+  namespace: $POD_NAMESPACE   # 选择的命名空间 
+  labels: # 标签
+    app: web  # 部署服务类型
+spec:             # spec：包括一些containers/storage/volumes设置的一些参数。
+  containers:
+    - name: $CONTAINER_NAME # 容器名字 
+      image: $CICD_REGISTRY/${CICD_GIT_REPO_NAME}:${CICD_EXECUTION_SEQUENCE}  # 生成容器所需的镜像名字，$镜像仓库/$项目名字:$镜像版本
+      ports:
+        - containerPort: 5000

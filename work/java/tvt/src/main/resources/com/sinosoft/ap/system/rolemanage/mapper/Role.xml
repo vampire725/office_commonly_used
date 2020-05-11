@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.rolemanage.domain.RoleRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.rolemanage.domain.RoleEntity">
+	    <result column="ROLE_ID" property="roleId" />
+	    <result column="ROLE_DESC" property="roleDesc" />
+	    <result column="ROLE_CREATETIME" property="roleCreatetime" />
+	    <result column="ROLE_NAME" property="roleName" />
+	    <result column="ROLE_CODE" property="roleCode" />
+    </resultMap>
+
+    <sql id="sql">
+	    ROLE_ID,
+	    ROLE_DESC,
+	    ROLE_CREATETIME,
+	    ROLE_NAME,
+	    ROLE_CODE
+    </sql>
+
+	<insert id="insert" parameterType="com.sinosoft.ap.system.rolemanage.domain.RoleEntity">
+		INSERT INTO APS_ROLE(<include refid="sql" />) VALUES
+		(
+	    #{roleId},
+	    #{roleDesc},
+	    #{roleCreatetime},
+	    #{roleName},
+	    #{roleCode}
+		);
+	</insert>
+
+	<delete id="delete" parameterType="com.sinosoft.ap.system.rolemanage.domain.RoleEntity">
+		DELETE FROM APS_ROLE 
+		WHERE
+		1=1
+		<if test ="roleId != null">
+		AND ROLE_ID = #{roleId}
+		</if>
+		<if test ="roleDesc != null">
+		AND ROLE_DESC = #{roleDesc}
+		</if>
+		<if test ="roleCreatetime != null">
+		AND ROLE_CREATETIME = #{roleCreatetime}
+		</if>
+		<if test ="roleName != null">
+		AND ROLE_NAME = #{roleName}
+		</if>
+		<if test ="roleCode != null">
+		AND ROLE_CODE = #{roleCode}
+		</if>
+	</delete>
+
+	<update id="update" parameterType="com.sinosoft.ap.system.rolemanage.domain.RoleEntity">
+		UPDATE APS_ROLE  
+		<trim prefix="SET" prefixOverrides=","> 
+		<if test ="roleDesc != null">
+		,ROLE_DESC =#{roleDesc}
+		</if>		
+		<if test ="roleCreatetime != null">
+		,ROLE_CREATETIME =#{roleCreatetime}
+		</if>		
+		<if test ="roleName != null">
+		,ROLE_NAME =#{roleName}
+		</if>		
+		<if test ="roleCode != null">
+		,ROLE_CODE =#{roleCode}
+		</if>
+		</trim>		
+		where 
+		ROLE_ID = #{roleId}
+	</update>
+	
+    <select id="select" resultMap="baseMap" parameterType="com.sinosoft.ap.system.rolemanage.domain.RoleEntity">
+        SELECT <include refid="sql" /> from  APS_ROLE
+        WHERE
+        1=1
+		<if test ="roleId != null">
+		AND ROLE_ID =#{roleId}
+		</if>	
+		<if test ="roleDesc != null">
+		AND ROLE_DESC =#{roleDesc}
+		</if>	
+		<if test ="roleCreatetime != null">
+		AND ROLE_CREATETIME =#{roleCreatetime}
+		</if>	
+		<if test ="roleName != null">
+		AND ROLE_NAME =#{roleName}
+		</if>	
+		<if test ="roleCode != null">
+		AND ROLE_CODE =#{roleCode}
+		</if>	
+    </select>
+    
+    <select id="selectUserRole" resultMap="baseMap" parameterType="java.lang.String">
+        SELECT 
+		APS_ROLE.ROLE_ID,
+	    ROLE_DESC,
+	    ROLE_CREATETIME,
+	    ROLE_NAME,
+	    ROLE_CODE 
+		from  APS_ROLE
+        join APS_USER_ROLE_REL on APS_ROLE.ROLE_ID = APS_USER_ROLE_REL.ROLE_ID
+        WHERE
+        APS_USER_ROLE_REL.USER_ID = #{userId} 
+    </select>
+</mapper>

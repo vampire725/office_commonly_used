@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sinosoft.ap.system.czAuditanage.domain.TOperateRepository">
+	<resultMap id="baseMap" type="com.sinosoft.ap.system.czAuditanage.domain.TOperateEntity">
+		<result column="op_id" property="opId" jdbcType="VARCHAR" />
+		<result column="op_type" property="opType" jdbcType="INTEGER" />
+		<result column="op_user_name" property="opName"
+			jdbcType="VARCHAR" />
+		<result column="op_detail" property="opDetail"
+			jdbcType="VARCHAR" />
+		<result column="op_result" property="opResult"
+			jdbcType="INTEGER" />
+		<result column="op_time" property="opTime" jdbcType="TIMESTAMP" />
+		<result column="op_system" property="opSystem"
+			jdbcType="VARCHAR" />
+		<result column="op_system_code" property="opSystemCode"
+			jdbcType="VARCHAR" />
+		<result column="op_user_id" property="opUserId"
+			jdbcType="VARCHAR" />
+		<result column="op_system_module" property="opSystemModule"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<!-- void insertOperate(TOperateEntity operate)throws Exception; -->
+	<insert id="insertOperate" parameterType="com.sinosoft.ap.system.czAuditanage.domain.TOperateEntity">
+		insert into ap_system_operate_log 
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="opId != null and opId != '' ">
+				op_id,
+			</if>
+			<if test="opType != null">
+				op_type,
+			</if>
+			<if test="opName != null and opName !=''">
+				op_user_name,
+			</if>
+			<if test="opDetail != null and opDetail !=''">
+				op_detail,
+			</if>
+			<if test="opResult !=null">
+				op_result,
+			</if>
+			<if test="opTime != null">
+				op_time,
+			</if>
+			<if test="opSystem != null and opSystem !=''">
+				op_system,
+			</if>
+			<if test="opSystemCode != null and opSystemCode !=''">
+				op_system_code,
+			</if>
+			<if test="opUserId != null and opUserId !=''">
+				op_user_id,
+			</if>
+			<if test="opSystemModule != null and opSystemModule !=''">
+				op_system_module
+			</if>
+		</trim>
+		<trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="opId != null and opId != '' ">
+				#{opId},
+			</if>
+			<if test="opType != null">
+				#{opType},
+			</if>
+			<if test="opName != null and opName !=''">
+				#{opName},
+			</if>
+			<if test="opDetail != null and opDetail !=''">
+				#{opDetail},
+			</if>
+			<if test="opResult !=null">
+				#{opResult},
+			</if>
+			<if test="opTime != null">
+				#{opTime},
+			</if>
+			<if test="opSystem != null and opSystem !=''">
+				#{opSystem},
+			</if>
+			<if test="opSystemCode != null and opSystemCode !=''">
+				#{opSystemCode},
+			</if>
+			<if test="opUserId != null and opUserId !=''">
+				#{opUserId},
+			</if>
+			<if test="opSystemModule != null">
+				#{opSystemModule}
+			</if>
+		</trim> 
+		
+	</insert>
+	<!-- Integer deleteById(List<String> list)throws Exception; -->
+	<delete id="deleteById" parameterType="java.util.List">
+		delete  from ap_system_operate_log
+		<where>
+		<if test="list!=null">		
+			and op_id in 
+			<foreach collection="list" item="opId" open="(" separator="," close=")">		
+				#{opId} 
+			</foreach>
+		</if>
+		</where>
+	</delete>
+	<!-- List<TOperateEntity> selectDistincts(TOperateEntity operate)throws Exception;-->
+	<select id="selectDistincts" parameterType="com.sinosoft.ap.system.czAuditanage.domain.TOperateEntity" resultMap="baseMap">
+		SELECT op_id,op_type,op_user_name,op_detail,op_result,op_time,op_system,
+		op_system_code,op_user_id,op_system_module FROM ap_system_operate_log 
+		WHERE op_user_name=#{opName} 
+	</select>
+	<select id="selectOperateList" parameterType="com.sinosoft.ap.system.czAuditanage.domain.TOperateEntity" resultMap="baseMap">
+		SELECT op_id,op_type,op_user_name,op_detail,op_result,op_time,op_system,
+		op_system_code,op_user_id,op_system_module FROM ap_system_operate_log 
+		 WHERE
+        1=1
+		<if test ="opId != null &amp;&amp; opId !='' ">
+		AND op_id = #{opId}
+		</if>	
+		<if test="opType != null">
+		AND op_type = #{opType}
+		</if>	
+		<if test="opName != null and opName !=''">
+		AND op_user_name LIKE '%${opName}%' ESCAPE '/'
+		</if>
+		<if test="opDetail != null and opDetail !=''">
+		AND op_detail LIKE '%${opDetail}%' ESCAPE '/'
+		</if>
+		<if test="opResult !=null">
+		AND op_result= #{opResult}
+	    </if>
+		<if test="opTime != null">
+		AND op_time =#{opTime}
+		</if>
+		<if test="startTime != null ">
+		AND op_time <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null ">
+		AND op_time <![CDATA[<=]]> #{endTime}
+		</if>
+		<if test="opSystem != null and opSystem !=''">
+		AND op_system=#{opSystem}
+		</if>
+		<if test="opSystemCode != null and opSystemCode !=''">
+		AND op_system_code =#{opSystemCode}
+		</if>
+		<if test="opUserId != null and opUserId !=''">
+		AND op_user_id =#{opUserId}
+		</if>
+		<if test="opSystemModule != null and opSystemModule !=''">
+		AND op_system_module LIKE '%${opSystemModule}%' ESCAPE '/'
+		</if>
+        <if test="fssort==1">
+			ORDER BY op_time asc
+		</if>
+		<if test="fssort==2">
+			ORDER BY op_time desc
+		</if>
+        </select>
+</mapper>

@@ -1,0 +1,27 @@
+
+:remote connect tinkerpop.server conf/remote.yaml session
+:remote console
+GraphOfTheGodsFactory.load(graph2)
+g = graph.traversal()
+mgmt = graph.openManagement()
+mgmt.getOpenInstances()
+mgmt.forceCloseInstance('ID')
+mgmt.buildIndex('nameMixed', Vertex.class).addKey(name, Mapping.STRING.asParameter()).buildMixedIndex("search")
+
+g.V().as('a').out('battled').in('battled').where(neq('a')).addE('father').from('a').property('age',2009)
+g.V().out().valueMap('name')这个也不知道遍历的是谁的名字  总的名字并不是很全
+g.V().filter(label()).map(values('name')) 这个是所有点拥有标签的名字
+g.E().filter(label()) 边的所有标签
+
+storage.backend=hbase
+storage.hostname=localhost
+storage.hbase.table=haha
+cache.db-cache = true
+cache.db-cache-clean-wait = 20
+cache.db-cache-time = 180000
+cache.db-cache-size = 0.5
+index.search.backend=elasticsearch
+index.search.hostname=localhost
+gremlin.graph=org.janusgraph.core.JanusGraphFactory
+schema.default = none
+storage.batch-loading=true

@@ -1,0 +1,36 @@
+# SSH
+ssh-keygen
+
+
+ rm .ssh/known_hosts
+
+
+sudo apt install sshpass
+
+# 免密
+sudo vi /etc/ssh/ssh_config
+StrictHostKeyChecking no
+				
+	
+sshpass -p 1qaz2WSX3edc4RFV ssh-copy-id rancher@192.168.129.110
+sshpass -p 1qaz2WSX3edc4RFV ssh-copy-id rancher@192.168.129.111
+sshpass -p 1qaz2WSX3edc4RFV ssh-copy-id rancher@192.168.129.112
+sshpass -p 1qaz2WSX3edc4RFV ssh-copy-id rancher@192.168.129.113
+sshpass -p 1qaz2WSX3edc4RFV ssh-copy-id rancher@192.168.129.114
+sshpass -p 1qaz2WSX3edc4RFV ssh-copy-id rancher@192.168.129.115
+sshpass -p 1qaz2WSX3edc4RFV ssh-copy-id rancher@10.20.10.117
+
+
+# Longhorn
+1、更改console为Ubuntu
+2、安装sudo apt install -y open-iscsi
+3、更改sudo vi /etc/iscsi/iscsid.conf
+	注释#iscsid.startup = /bin/systemctl start iscsid.socket
+	打开iscsid.startup = /sbin/iscsid
+4、安装/升级longhorn
+
+# 私有仓库
+
+sudo mkdir -p  /etc/docker/certs.d/192.168.129.112\:10001/
+sudo chmod 777 /etc/docker/certs.d/192.168.129.112\:10001/
+scp -p /etc/docker/certs.d/192.168.129.112\:10001/ca.crt rancher@192.168.129.134:/etc/docker/certs.d/192.168.129.112\:10001/ca.crt

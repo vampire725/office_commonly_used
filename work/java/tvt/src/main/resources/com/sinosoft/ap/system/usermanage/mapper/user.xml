@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.usermanage.domain.UserRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.usermanage.domain.UserEntity">
+	    <result column="USER_ID" property="userId" />
+	    <result column="USER_CREATETIME" property="userCreatetime" />
+	    <result column="USER_TELNUMBER" property="userTelnumber" />
+	    <result column="USER_ID_CODE" property="userIdCode" />
+	    <result column="USER_ACCOUNT" property="userAccount" />
+	    <result column="USER_MAIL" property="userMail" />
+	    <result column="USER_DOMICILE" property="userDomicile" />
+	    <result column="LAST_UPDATE_TIME" property="lastUpdateTime" />
+	    <result column="USER_BIRTH" property="userBirth" />
+	    <result column="USER_NAME" property="userName" />
+	    <result column="USER_ADDRESS" property="userAddress" />
+	    <result column="USER_POSITION" property="userPosition" />
+	    <result column="USER_NATION" property="userNation" />
+	    <result column="ID_CARD" property="idCard" />
+	    <result column="USER_GENDER" property="userGender" />
+	    <result column="USER_MAC_ADDR" property="macAddr" />
+	    <result column="USER_STATUS" property="userStatus" />
+	    <result column="organ_id" property="organId" />
+	    <result column="ORGAN_CODE" property="organCode"/>
+        <result column="ORGAN_NAME" property="organName"/>
+    </resultMap>
+
+    <sql id="sql">
+	    USER_ID,
+	    USER_CREATETIME,
+	    USER_TELNUMBER,
+	    USER_ID_CODE,
+	    USER_ACCOUNT,
+	    USER_STATUS,
+	    USER_MAIL
+    </sql>
+
+	<insert id="insert" parameterType="com.sinosoft.ap.system.usermanage.domain.UserEntity">
+		INSERT INTO APS_USER(<include refid="sql" />) VALUES
+		(
+	    #{userId},
+	    #{userCreatetime},
+	    #{userTelnumber},
+	    #{userIdCode},
+	    #{userAccount},
+	    #{userStatus},
+	    #{userMail}
+		);
+	</insert>
+	
+		<insert id="insertD" parameterType="com.sinosoft.ap.system.usermanage.domain.UserDetailsEntity">
+		INSERT INTO aps_user_details(
+		USER_ID,
+	    USER_DETAILS_ID,
+	    USER_DOMICILE,
+	    LAST_UPDATE_TIME,
+	    USER_BIRTH,
+	    USER_NAME,
+	    USER_ADDRESS,
+	    USER_POSITION,
+	    USER_NATION,
+	    ID_CARD,
+	    USER_GENDER) VALUES
+		(
+	    #{userId},
+	   	#{userDetailsId},
+	    #{userDomicile},
+	    #{lastUpdateTime},
+	    #{userBirth},
+	    #{userName},
+	    #{userAddress},
+	    #{userPosition},
+	    #{userNation},
+	    #{idCard},
+	    #{userGender}
+		);
+	</insert>
+
+	<delete id="delete" parameterType="com.sinosoft.ap.system.usermanage.domain.UserEntity">
+		DELETE APS_USER ,aps_user_details FROM APS_USER ,aps_user_details
+		WHERE
+		APS_USER.USER_ID = aps_user_details.USER_ID
+		and 
+		aps_user_details.USER_ID = #{userId}
+	</delete>
+
+	<update id="update" parameterType="com.sinosoft.ap.system.usermanage.domain.UserEntity">
+		UPDATE APS_USER  
+		join aps_user_details on APS_USER.USER_ID = aps_user_details.USER_ID
+		<trim prefix="SET" prefixOverrides=",">
+		<if test ="userCreatetime != null">
+		,APS_USER.USER_CREATETIME =#{userCreatetime}
+		</if>		
+		<if test ="userTelnumber != null">
+		,APS_USER.USER_TELNUMBER =#{userTelnumber}
+		</if>		
+		<if test ="userIdCode != null">
+		,APS_USER.USER_ID_CODE =#{userIdCode}
+		</if>		
+		<if test ="userAccount != null">
+		,APS_USER.USER_ACCOUNT =#{userAccount}
+		</if>		
+		<if test ="userMail != null">
+		,APS_USER.USER_MAIL =#{userMail}
+		</if>
+		<if test ="macAddr != null">
+		,APS_USER.USER_MAC_ADDR =#{macAddr}
+		</if>
+		<if test ="userStatus != null">
+		,APS_USER.USER_STATUS =#{userStatus}
+		</if>
+		<if test ="userDomicile != null &amp;&amp; userDomicile !='' ">
+		,aps_user_details.USER_DOMICILE =#{userDomicile}
+		</if>
+		<if test ="lastUpdateTime != null ">
+		,aps_user_details.LAST_UPDATE_TIME =#{lastUpdateTime}
+		</if>
+		<if test ="userBirth != null ">
+		,aps_user_details.USER_BIRTH =#{userBirth}
+		</if>
+		<if test ="userId != null &amp;&amp; userId !='' ">
+		,aps_user_details.USER_ID =#{userId}
+		</if>
+		<if test ="userName != null &amp;&amp; userName !='' ">
+		,aps_user_details.USER_NAME =#{userName}
+		</if>
+		<if test ="userAddress != null &amp;&amp; userAddress !='' ">
+		,aps_user_details.USER_ADDRESS =#{userAddress}
+		</if>
+		<if test ="userPosition != null &amp;&amp; userPosition !='' ">
+		,aps_user_details.USER_POSITION =#{userPosition}
+		</if>
+		<if test ="userNation != null &amp;&amp; userNation !='' ">
+		,aps_user_details.USER_NATION =#{userNation}
+		</if>	
+		<if test ="idCard != null &amp;&amp; idCard !='' ">
+		,aps_user_details.ID_CARD =#{idCard}
+		</if>	
+		<if test ="userGender != null &amp;&amp; userGender !='' ">
+		,aps_user_details.USER_GENDER =#{userGender}
+		</if>
+		</trim>		
+		where 
+		APS_USER.USER_ID = #{userId}
+	</update>
+	
+    <select id="select" resultMap="baseMap" parameterType="com.sinosoft.ap.system.usermanage.domain.UserEntity">
+        SELECT  
+        APS_USER.USER_ID,
+	    APS_USER.USER_CREATETIME,
+	    APS_USER.USER_TELNUMBER,
+	    APS_USER.USER_ID_CODE,
+	    APS_USER.USER_ACCOUNT,
+	    APS_USER.USER_MAIL,
+	    APS_USER.USER_MAC_ADDR,
+	    APS_USER.USER_STATUS,
+	    aps_user_details.USER_DOMICILE,
+	    aps_user_details.LAST_UPDATE_TIME,
+	    aps_user_details.USER_BIRTH,
+	    aps_user_details.USER_NAME,
+	    aps_user_details.USER_ADDRESS,
+	    aps_user_details.USER_POSITION,
+	    aps_user_details.USER_NATION,
+	    aps_user_details.ID_CARD,
+	    aps_user_details.USER_GENDER 
+	     from  APS_USER
+	    left join aps_user_details on APS_USER.USER_ID=aps_user_details.USER_ID
+        <if test ="organId != null">
+		join
+		APS_USER_ORGANIZATION_REL
+		on APS_USER.USER_ID = APS_USER_ORGANIZATION_REL.USER_ID
+		</if>
+        WHERE
+        1=1
+		<if test ="userId != null">
+		AND APS_USER.USER_ID =#{userId}
+		</if>	
+		<if test ="userCreatetime != null">
+		AND APS_USER.USER_CREATETIME =#{userCreatetime}
+		</if>	
+		<if test ="userTelnumber != null">
+		AND APS_USER.USER_TELNUMBER =#{userTelnumber}
+		</if>	
+		<if test ="userIdCode != null">
+		AND APS_USER.USER_ID_CODE =#{userIdCode}
+		</if>	
+		<if test ="userAccount != null">
+		AND APS_USER.USER_ACCOUNT ${userAccount}
+		</if>	
+		<if test ="userMail != null">
+		AND APS_USER.USER_MAIL =#{userMail}
+		</if>		
+		<if test ="organId != null">
+		AND APS_USER_ORGANIZATION_REL.ORGAN_ID =#{organId}
+		</if>	
+		<if test ="userDomicile != null &amp;&amp; userDomicile !='' ">
+		AND aps_user_details.USER_DOMICILE =#{userDomicile}
+		</if>
+		<if test ="lastUpdateTime != null ">
+		AND aps_user_details.LAST_UPDATE_TIME =#{lastUpdateTime}
+		</if>
+		<if test ="userBirth != null ">
+		AND aps_user_details.USER_BIRTH =#{userBirth}
+		</if>
+		<if test ="userName != null &amp;&amp; userName !='' ">
+		AND aps_user_details.USER_NAME =#{userName}
+		</if>
+		<if test ="userAddress != null &amp;&amp; userAddress !='' ">
+		AND aps_user_details.USER_ADDRESS =#{userAddress}
+		</if>
+		<if test ="userPosition != null &amp;&amp; userPosition !='' ">
+		AND aps_user_details.USER_POSITION =#{userPosition}
+		</if>
+		<if test ="userNation != null &amp;&amp; userNation !='' ">
+		AND aps_user_details.USER_NATION =#{userNation}
+		</if>
+		<if test ="idCard != null &amp;&amp; idCard !='' ">
+		AND aps_user_details.ID_CARD =#{idCard}
+		</if>
+		<if test ="userGender != null &amp;&amp; userGender !='' ">
+		AND aps_user_details.USER_GENDER =#{userGender}
+		</if>
+		order by aps_user_details.USER_POSITION*1 
+    </select>
+    <select id="selectUserOrganRel" resultMap="baseMap" parameterType="java.lang.String">
+       select a.USER_ID AS USER_ID,a.USER_ID_CODE AS USER_ID_CODE,
+		a.USER_ACCOUNT ,a.USER_TELNUMBER AS USER_TELNUMBER,a.USER_MAIL AS USER_MAIL,a.USER_MAC_ADDR AS USER_MAC_ADDR,
+		aps_user_details.USER_DOMICILE,
+	    aps_user_details.LAST_UPDATE_TIME,
+	    aps_user_details.USER_BIRTH,
+	    aps_user_details.USER_NAME,
+	    aps_user_details.USER_ADDRESS,
+	    aps_user_details.USER_POSITION,
+	    aps_user_details.USER_NATION,
+	    aps_user_details.ID_CARD,
+	    aps_user_details.USER_GENDER 
+		from
+		APS_USER AS a
+		left join aps_user_details on a.USER_ID = aps_user_details.USER_ID
+		join
+		APS_USER_ORGANIZATION_REL AS O 
+		on a.USER_ID=O.USER_ID
+		where O.ORGAN_ID=#{organId}	
+		order by a.USER_CREATETIME 
+    </select>
+
+
+    <select id="findOrganCodeByUserId" >
+		select b.ORGAN_CODE from aps_organization b,aps_user a,aps_user_organization_rel c
+		where b.ORGAN_ID = c.ORGAN_ID
+		and c.USER_ID = a.USER_ID
+		and a.USER_ID = #{_parameter}
+    </select>
+    
+    <select id="findUserByOrganCodeAndPermissionName" resultMap="baseMap">
+		select distinct A.* from aps_user A 
+		<if test ="arg0 != null &amp;&amp; arg0 !='' ">		
+		left join aps_user_organization_rel C on A.USER_ID = C.USER_ID
+		left join aps_organization D on D.ORGAN_ID = C.ORGAN_ID
+		</if>
+		<if test ="arg1 != null &amp;&amp; arg1 !='' ">			
+		left join aps_user_permission_rel B on A.USER_ID = B.USER_ID
+		left join aps_permission E on E.PERMISSION_ID = B.PERMISSION_ID
+		</if>
+		where 
+		1=1
+		<if test ="arg0 != null &amp;&amp; arg0 !='' ">	
+		 AND D.ORGAN_CODE = #{arg0}
+		</if>
+		<if test ="arg1 != null &amp;&amp; arg1 !='' ">	
+		and E.PERMISSION_NAME = #{arg1}
+		</if>
+    </select>
+    <select id="findUserLikeOrganCodeAndPermissionName" resultMap="baseMap">
+		select distinct A.*
+		<if test ="arg0 != null &amp;&amp; arg0 !='' ">	
+		,D.ORGAN_ID,D.ORGAN_CODE,D.ORGAN_NAME
+		</if>
+		from aps_user A 
+		<if test ="arg0 != null &amp;&amp; arg0 !='' ">		
+		left join aps_user_organization_rel C on A.USER_ID = C.USER_ID
+		left join aps_organization D on D.ORGAN_ID = C.ORGAN_ID
+		</if>
+		<if test ="arg1 != null &amp;&amp; arg1 !='' ">			
+		left join aps_user_permission_rel B on A.USER_ID = B.USER_ID
+		left join aps_permission E on E.PERMISSION_ID = B.PERMISSION_ID
+		</if>
+		where 
+		1=1
+		<if test ="arg0 != null &amp;&amp; arg0 !='' ">	
+		 AND D.ORGAN_CODE like '${arg0}%'
+		</if>
+		<if test ="arg1 != null &amp;&amp; arg1 !='' ">	
+		and E.PERMISSION_NAME = #{arg1}
+		</if>
+    </select>
+    
+    
+    
+</mapper>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.permissionmanage.domain.PermissionRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.permissionmanage.domain.PermissionEntity">
+	    <result column="PERMISSION_ID" property="permissionId" />
+	    <result column="PERMISSION_CODE" property="permissionCode" />
+	    <result column="PERMISSION_CREATETIME" property="permissionCreatetime" />
+	    <result column="PERMISSION_NAME" property="permissionName" />
+	    <result column="PERMISSION_DESC" property="permissionDesc" />
+		<result column="PERMISSION_TYPE" property="permissionType" />
+		<result column="PERMISSION_STATUS" property="permissionStatus" />
+		<result column="PERMISSION_SYMBOL" property="permissionSymbol" />
+		<result column="PERMISSION_ENTRYUSER" property="permissionEntryuser" />
+		<result column="PERMISSION_DESTROYTIME" property="permissionDestroytime" />
+		<result column="PERMISSION_REASON" property="permissionReason" />
+		<result column="RESOURCE_ID" property="resourceId" />
+    </resultMap>
+
+    <sql id="sql">
+	    PERMISSION_ID,
+	    PERMISSION_CODE,
+	    PERMISSION_CREATETIME,
+	    PERMISSION_NAME,
+	    PERMISSION_DESC
+    </sql>
+
+	<insert id="insert" parameterType="com.sinosoft.ap.system.permissionmanage.domain.PermissionEntity">
+		INSERT INTO APS_PERMISSION(<include refid="sql" />) VALUES
+		(
+	    #{permissionId},
+	    #{permissionCode},
+	    #{permissionCreatetime},
+	    #{permissionName},
+	    #{permissionDesc}
+		);
+	</insert>
+
+	<delete id="delete" parameterType="com.sinosoft.ap.system.permissionmanage.domain.PermissionEntity">
+		DELETE FROM APS_PERMISSION 
+		WHERE
+		1=1
+		<if test ="permissionId != null &amp;&amp; permissionId !='' ">
+		AND PERMISSION_ID = #{permissionId}
+		</if>
+		<if test ="permissionCode != null &amp;&amp; permissionCode !='' ">
+		AND PERMISSION_CODE = #{permissionCode}
+		</if>
+		<if test ="permissionCreatetime != null">
+		AND PERMISSION_CREATETIME = #{permissionCreatetime}
+		</if>
+		<if test ="permissionName != null &amp;&amp; permissionName !='' ">
+		AND PERMISSION_NAME = #{permissionName}
+		</if>
+		<if test ="permissionDesc != null &amp;&amp; permissionDesc !='' ">
+		AND PERMISSION_DESC = #{permissionDesc}
+		</if>
+	</delete>
+
+	<update id="update" parameterType="com.sinosoft.ap.system.permissionmanage.domain.PermissionEntity">
+		UPDATE APS_PERMISSION  
+		<trim prefix="SET" prefixOverrides=",">
+		<if test ="permissionCode != null &amp;&amp; permissionCode !='' ">
+		,PERMISSION_CODE =#{permissionCode}
+		</if>		
+		<if test ="permissionCreatetime != null ">
+		,PERMISSION_CREATETIME =#{permissionCreatetime}
+		</if>		
+		<if test ="permissionName != null &amp;&amp; permissionName !='' ">
+		,PERMISSION_NAME =#{permissionName}
+		</if>		
+		<if test ="permissionDesc != null &amp;&amp; permissionDesc !='' ">
+		,PERMISSION_DESC =#{permissionDesc}
+		</if>
+		</trim>		
+		where 
+		PERMISSION_ID = #{permissionId}
+	</update>
+	
+    <select id="select" resultMap="baseMap" parameterType="com.sinosoft.ap.system.permissionmanage.domain.PermissionEntity">
+        SELECT
+        APS_PERMISSION.PERMISSION_ID,
+        APS_PERMISSION.PERMISSION_CODE,
+        APS_PERMISSION.PERMISSION_CREATETIME,
+        APS_PERMISSION.PERMISSION_NAME,
+        APS_PERMISSION.PERMISSION_TYPE,
+        APS_PERMISSION.PERMISSION_STATUS,
+        APS_PERMISSION.PERMISSION_ENTRYUSER,
+        APS_PERMISSION.PERMISSION_DESTROYTIME,
+        APS_PERMISSION.PERMISSION_SYMBOL,
+        APS_PERMISSION.PERMISSION_REASON,
+        APS_PERMISSION.PERMISSION_DESC from  APS_PERMISSION
+	    <if test ="roleId != null &amp;&amp; roleId !='' ">
+		join APS_PERMISSION_ROLE_REL
+		on APS_PERMISSION.PERMISSION_ID = APS_PERMISSION_ROLE_REL.PERMISSION_ID
+		</if>
+        WHERE
+        1=1
+		<if test ="permissionId != null &amp;&amp; permissionId !='' ">
+		AND APS_PERMISSION.PERMISSION_ID =#{permissionId}
+		</if>	
+		<if test ="permissionCode != null &amp;&amp; permissionCode !='' ">
+		AND APS_PERMISSION.PERMISSION_CODE =#{permissionCode}
+		</if>	
+	<!-- 	<if test ="permissionCreatetime != null">
+		AND APS_PERMISSION.PERMISSION_CREATETIME =#{permissionCreatetime}
+		</if>	 -->
+		<if test ="permissionName != null &amp;&amp; permissionName !='' ">
+		AND APS_PERMISSION.PERMISSION_NAME =#{permissionName}
+		</if>	
+		<if test ="permissionDesc != null &amp;&amp; permissionDesc !='' ">
+		AND APS_PERMISSION.PERMISSION_DESC =#{permissionDesc}
+		</if>
+        <if test ="permissionStatus != null">
+            AND APS_PERMISSION.PERMISSION_STATUS =#{permissionStatus}
+        </if>
+        <if test ="permissionSymbol !=null">
+            AND PERMISSION_SYMBOL = #{permissionSymbol}
+        </if>
+		<if test ="roleId != null &amp;&amp; roleId !='' ">
+		AND APS_PERMISSION_ROLE_REL.ROLE_ID = #{roleId}
+		</if>	
+    </select>
+    
+    <select id="selectOrganPermission" resultMap="baseMap" parameterType="java.lang.String">
+        SELECT 
+        APS_PERMISSION.PERMISSION_ID,
+	    APS_PERMISSION.PERMISSION_CODE,
+	    APS_PERMISSION.PERMISSION_CREATETIME,
+	    APS_PERMISSION.PERMISSION_NAME,
+	    APS_PERMISSION.PERMISSION_DESC from  APS_PERMISSION
+		join APS_PERMISSION_ORGAN_REL
+		on APS_PERMISSION.PERMISSION_ID = APS_PERMISSION_ORGAN_REL.PERMISSION_ID
+        WHERE
+		APS_PERMISSION_ORGAN_REL.ORGAN_ID = #{organId}
+    </select>
+    
+    <select id="selectUserPermission" resultMap="baseMap" parameterType="java.lang.String">
+        SELECT
+        APS_PERMISSION.PERMISSION_ID,
+        APS_PERMISSION.PERMISSION_CODE,
+        APS_PERMISSION.PERMISSION_CREATETIME,
+        APS_PERMISSION.PERMISSION_NAME,
+        APS_PERMISSION.PERMISSION_DESC,
+        APS_PERMISSION.PERMISSION_TYPE,
+        APS_PERMISSION.PERMISSION_STATUS,
+        APS_PERMISSION.PERMISSION_ENTRYUSER,
+        APS_PERMISSION.PERMISSION_SYMBOL,
+        APS_PERMISSION.PERMISSION_DESTROYTIME,
+        APS_PERMISSION_RESOURCE_REL.RESOURCE_ID
+        from  APS_PERMISSION
+		join APS_USER_PERMISSION_REL
+		on APS_PERMISSION.PERMISSION_ID = APS_USER_PERMISSION_REL.PERMISSION_ID
+		left join APS_PERMISSION_RESOURCE_REL
+		on APS_PERMISSION_RESOURCE_REL.PERMISSION_ID=APS_PERMISSION.PERMISSION_ID
+        WHERE
+		APS_USER_PERMISSION_REL.USER_ID = #{userId}
+    </select>
+</mapper>

@@ -1,0 +1,124 @@
+kubectl create secret docker-registry myregistrykey --docker-server=http://index.docker.io/v1/ --docker-username=admin --docker-password=asd123
+
+
+
+kubectl create secret -n  code-env docker-registry nexus --docker-server=http://192.168.129.111:9896/v2/ --docker-username=admin --docker-password=asd123
+kubectl create secret docker-registry nexus --docker-server=http://192.168.129.111:9896/v2/ --docker-username=admin --docker-password=asd123
+
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube100-falsk04
+  namespace: code-env
+  labels:
+    app: web
+spec:
+  containers:
+    - name: flaskapp-demo
+      image: bala2:26f2024
+      ports:
+        - containerPort: 5000
+  imagePullSecrets:
+    - name: p-58lp4-1921681291119896
+
+kubectl中的强制删除命令
+
+# 删除pod
+kubectl delete pod -n NAMESPACENAME PODNAME --force --grace-period=0
+
+# 删除NAMESPACE
+kubectl delete namespace NAMESPACENAME --force --grace-period=0
+
+#  强制删除命名空间
+
+1. kubectl get ns $NAMESPACE -o json > tmp.json
+
+2. 在rancher创建API/KEY，
+
+3. curl -X PUT --data-binary @cattle-prometheus.json https://faii.com.cn:20001/k8s/clusters/c-krz5b/api/v1/namespaces/cattle-prometheus/finalize -H "Content-Type:application/json" --header "Authorization: Bearer $TOKEN" --insecure
+
+
+
+# 集群出现问题后的删除命令
+docker system prune -a
+docker rm -f $(sudo docker ps -aq);
+docker volume rm $(sudo docker volume ls -q);
+
+sudo rm -rf /etc/ceph \
+       /etc/cni \
+       /etc/kubernetes \
+       /opt/cni \
+       /opt/rke \
+       /run/secrets/kubernetes.io \
+       /run/calico \
+       /run/flannel \
+       /var/lib/calico \
+       /var/lib/etcd \
+       /var/lib/cni \
+       /var/lib/kubelet \
+       /var/lib/rancher/rke/log \
+       /var/log/containers \
+       /var/log/pods \
+       /var/run/calico
+
+
+       
+#删除/var/etcd目录
+sudo rm -rf /var/etcd
+
+#删除/var/lib/kubelet/目录，删除前先卸载
+for m in $(sudo tac /proc/mounts | sudo awk '{print $2}'|sudo grep /var/lib/kubelet);do
+umount $m||true
+done
+sudo rm -rf /var/lib/kubelet/
+
+#不要删除/var/lib/rancher/目录！！！！！，可以卸载
+for m in $(sudo tac /proc/mounts | sudo awk '{print $2}'|sudo grep /var/lib/rancher);do
+umount $m||true
+done
+
+#删除/run/kubernetes/ 目录
+sudo rm -rf /run/kubernetes/
+
+#删除所有的数据卷
+sudo docker volume rm $(sudo docker volume ls -q)
+#再次显示所有的容器和数据卷，确保没有残留
+sudo docker ps -a
+sudo docker volume ls
+
+
+rm -f /var/lib/containerd/io.containerd.metadata.v1.bolt/meta.db
+sudo systemctl restart containerd
+sudo systemctl restart docker
+
+
+
+# kubectl 设置
+sudo wget https://docs.rancher.cn/download/kubernetes/linux-amd64-v1.17.3-kubectl
+sudo chmod +x linux-amd64-v1.17.3-kubectl
+sudo mv linux-amd64-v1.17.3-kubectl  /usr/local/bin/kubectl 
+
+
+sudo mkdir ~/.kube
+sudo vi ~/.kube/config
+
+echo "source <(kubectl completion bash)" >> ~/.bashrc
+source ~/.bashrc
+
+
+     kubectl命令补全出错：kubectl ge-bash: _get_comp_words_by_ref: command not found
+
+     安装kubernets后，使用source <(kubectl completion bash)报错
+
+	kubectl ge-bash: _get_comp_words_by_ref: command not found
+	解决办法：
+	# yum install -y bash-completion
+
+	# source /usr/share/bash-completion/bash_completion
+
+	# source <(kubectl completion bash)
+
+
+

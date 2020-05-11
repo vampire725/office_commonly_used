@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.permissionrolerel.domain.UserRoleRelRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.permissionrolerel.domain.UserRoleRelEntity">
+	    <result column="USER_ID" property="userId" />
+	    <result column="ROLE_ID" property="roleId" />
+    </resultMap>
+
+    <sql id="sql">
+	    USER_ID,
+	    ROLE_ID
+    </sql>
+
+	<insert id="insert" parameterType="com.sinosoft.ap.system.permissionrolerel.domain.UserRoleRelEntity">
+		INSERT INTO APS_USER_ROLE_REL(<include refid="sql" />) VALUES
+		(
+	    #{userId},
+	    #{roleId}
+		);
+	</insert>
+	
+	<insert id="insertMore" parameterType="com.sinosoft.ap.system.permissionrolerel.domain.UserRolesRelEntity">
+		INSERT INTO APS_USER_ROLE_REL(<include refid="sql" />) VALUES
+		<foreach collection="rolesId" item="item" separator=",">  
+		    (#{userId},
+		    #{item})
+        </foreach> 
+	</insert>
+
+	<delete id="delete" parameterType="com.sinosoft.ap.system.permissionrolerel.domain.UserRoleRelEntity">
+		DELETE FROM APS_USER_ROLE_REL 
+		WHERE
+		1=1
+		<if test ="userId != null">
+		AND USER_ID = #{userId}
+		</if>
+		<if test ="roleId != null">
+		AND ROLE_ID = #{roleId}
+		</if>
+	</delete>
+
+	
+    <select id="select" resultMap="baseMap" parameterType="com.sinosoft.ap.system.permissionrolerel.domain.UserRoleRelEntity">
+        SELECT <include refid="sql" /> from  APS_USER_ROLE_REL
+        WHERE
+        1=1
+		<if test ="userId != null">
+		AND USER_ID =#{userId}
+		</if>	
+		<if test ="roleId != null">
+		AND ROLE_ID =#{roleId}
+		</if>	
+    </select>
+</mapper>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.common.domain.CommonManageMapper">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.usermanage.domain.UserEntity">
+	    <result column="USER_ID" property="userId" />
+	    <result column="USER_CREATETIME" property="userCreatetime" />
+	    <result column="USER_TELNUMBER" property="userTelnumber" />
+	    <result column="USER_ID_CODE" property="userIdCode" />
+	    <result column="USER_ACCOUNT" property="userAccount" />
+	    <result column="USER_MAIL" property="userMail" />
+	    <result column="USER_DOMICILE" property="userDomicile" />
+	    <result column="LAST_UPDATE_TIME" property="lastUpdateTime" />
+	    <result column="USER_BIRTH" property="userBirth" />
+	    <result column="USER_NAME" property="userName" />
+	    <result column="USER_ADDRESS" property="userAddress" />
+	    <result column="USER_POSITION" property="userPosition" />
+	    <result column="USER_NATION" property="userNation" />
+	    <result column="ID_CARD" property="idCard" />
+	    <result column="USER_GENDER" property="userGender" />
+	    <result column="ORGAN_ID" property="organId"/>
+	    <result column="ORGAN_NAME" property="organName"/>
+        <result column="backField" property="backField"/>
+    </resultMap>
+
+    <sql id="sql">
+	    USER_ID,
+	    USER_CREATETIME,
+	    USER_TELNUMBER,
+	    USER_ID_CODE,
+	    USER_ACCOUNT,
+	    USER_MAIL
+    </sql>
+
+    <select id="selectUserInfoByRole" resultMap="baseMap" parameterType="com.sinosoft.ap.system.common.vo.RoleManageVO">
+		select  A.* 
+		from 
+		aps_user A ,
+		aps_user_role_rel rel,
+		aps_role r,
+		aps_user_organization_rel orel,
+		aps_organization o
+		where
+		 a.user_id = rel.user_id
+		 and rel.role_id = r.role_id
+		 and orel.ORGAN_ID = o.ORGAN_ID
+		 and orel.USER_ID = A.USER_ID
+		 <if test="roleName != null and roleName != ''">
+		 	and r.role_name = #{roleName}
+		 </if>
+		 <if test="roleCode != null and roleCode != ''">
+		 	and r.role_code = #{roleCode}
+		 </if>
+		 <if test="organId != null and organId != ''">
+		 	and o.ORGAN_ID = #{organId}
+		 </if>
+		 <if test="organCode != null and organCode != ''">
+		 	and o.ORGAN_CODE = #{organCode}
+		 </if>
+    </select>
+
+
+	<select id="selectUserInfoByRoles" resultMap="baseMap" parameterType="java.util.List">
+		select  A.* , r.role_name as backField
+		from
+		aps_user A ,
+		aps_user_role_rel rel,
+		aps_role r
+		where
+		a.user_id = rel.user_id
+		and rel.role_id = r.role_id
+		and r.role_name in
+		<foreach collection="list" item="item" open="(" separator=","  close=")">
+			#{item}
+		</foreach>
+	</select>
+</mapper>

@@ -1,0 +1,22 @@
+docker run -d --restart=unless-stopped -p 8082:80 -p 8081:443 rancher/rancher:latest
+
+
+
+# rancher升级
+docker stop <RANCHER_CONTAINER_NAME>
+docker create --volumes-from <RANCHER_CONTAINER_NAME> --name rancher-data rancher/rancher:<RANCHER_CONTAINER_TAG>
+docker run --volumes-from rancher-data -v $PWD:/backup busybox tar zcvf /backup/rancher-data-backup-<RANCHER_VERSION>-<DATE>.tar.gz /var/lib/rancher
+docker pull rancher/rancher:<RANCHER_VERSION_TAG>
+ docker run -d --volumes-from rancher-data \
+  --restart=unless-stopped \
+    -p 8082:80 -p 8081:443 \
+    rancher/rancher:<RANCHER_VERSION_TAG>
+
+
+
+
+docker run -d --restart=unless-stopped -p 8082:80 -p 8081:443 \
+ rancher/rancher:latest --no-cacerts
+
+
+

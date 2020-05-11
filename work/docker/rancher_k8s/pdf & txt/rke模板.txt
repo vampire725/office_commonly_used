@@ -1,0 +1,49 @@
+cat << EOF >  cluster.yml
+nodes:
+  - address: 172.24.205.194
+    hostname_override: master1
+    internal_address:
+    user: rancher
+    role: [controlplane,etcd]
+  - address: 172.24.205.192
+    hostname_override: master2
+    internal_address:
+    user: rancher
+    role: [controlplane,etcd]
+  - address: 172.24.205.190
+    hostname_override: master3
+    internal_address:
+    user: rancher
+    role: [controlplane,etcd]
+  - address: 172.24.205.193
+    hostname_override: node1
+    internal_address:
+    user: rancher
+    role: [worker]
+  - address: 172.24.205.191
+    hostname_override: node2
+    internal_address:
+    user: rancher
+    role: [worker]
+
+kubernetes_version: v1.17.2-rancher1-2
+
+services:
+  etcd:
+    extra_args:
+      auto-compaction-retention: 240
+      quota-backend-bytes: '6442450944'
+
+    snapshot: true
+    creation: 5m0s
+    retention: 24h
+  kubelet:
+    extra_args:
+      pod-manifest-path: "/etc/kubernetes/manifest/"
+network:
+  plugin: canal
+  options:
+    flannel_backend_type: "vxlan"
+ingress:
+  provider: nginx
+EOF

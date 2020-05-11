@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sinosoft.ap.system.resourcemanage.domain.ResourceRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.resourcemanage.domain.ResourceEntity">
+        <result column="RESOURCE_ID" property="resourceId"/>
+        <result column="RESOURCE_PARENT_ID" property="resourceParentId"/>
+        <result column="RESOURCE_CREATETIME" property="resourceCreatetime"/>
+        <result column="RESOURCE_SORT" property="resourceSort"/>
+        <result column="RESOURCE_NAME" property="resourceName"/>
+        <result column="RESOURCE_ADDRESS" property="resourceAddress"/>
+        <result column="RESOURCE_LEVEL" property="resourceLevel"/>
+        <result column="RESOURCE_TYPE" property="resourceType"/>
+        <result column="RESOURCE_DESC" property="resourceDesc"/>
+        <result column="RESOURCE_CODE" property="resourceCode"/>
+        <result column="RESOURCE_PATH" property="resourcePath"/>
+        <result column="RESOURCE_BELONG_TYPE" property="resourceBelongType"/>
+    </resultMap>
+    <resultMap id="IconMap" type="com.sinosoft.ap.system.resourcemanage.domain.ResourceVO">
+        <result column="RESOURCE_ID" property="resourceId"/>
+        <result column="RESOURCE_PARENT_ID" property="resourceParentId"/>
+        <result column="RESOURCE_CREATETIME" property="resourceCreatetime"/>
+        <result column="RESOURCE_SORT" property="resourceSort"/>
+        <result column="RESOURCE_NAME" property="resourceName"/>
+        <result column="RESOURCE_ADDRESS" property="resourceAddress"/>
+        <result column="RESOURCE_LEVEL" property="resourceLevel"/>
+        <result column="RESOURCE_TYPE" property="resourceType"/>
+        <result column="RESOURCE_DESC" property="resourceDesc"/>
+        <result column="RESOURCE_CODE" property="resourceCode"/>
+        <result column="RESOURCE_PATH" property="resourcePath"/>
+        <result column="RESOURCE_ICON_ID" property="resourceIconId"/>
+        <result column="RESOURCE_ICON_ADDRESS" property="resourceIconAddress"/>
+        <result column="RESOURCE_BELONG_TYPE" property="resourceBelongType"/>
+    </resultMap>
+
+    <resultMap id="resourceTree" type="com.sinosoft.ap.system.resourcemanage.domain.ResourceOperationTree">
+        <result column="RESOURCE_ID" property="id"/>
+        <result column="RESOURCE_PARENT_ID" property="parentId"/>
+        <result column="RESOURCE_SORT" property="resourceSort"/>
+        <result column="RESOURCE_NAME" property="name"/>
+        <result column="RESOURCE_ADDRESS" property="address"/>
+        <result column="RESOURCE_TYPE" property="type"/>
+        <result column="RESOURCE_DESC" property="desc"/>
+        <result column="RESOURCE_CODE" property="code"/>
+        <result column="RESOURCE_PATH" property="path"/>
+        <result column="RESOURCE_ICON_ADDRESS" property="icon"/>
+        <result column="RESOURCE_BELONG_TYPE" property="resourceBelongType"/>
+    </resultMap>
+    <resultMap id="operationTree" type="com.sinosoft.ap.system.resourcemanage.domain.ResourceOperationTree">
+        <result column="RESOURCE_ID" property="parentId"/>
+        <result column="OPERATION_ID" property="id"/>
+        <result column="OPERATION_NAME" property="name"/>
+        <result column="OPERATION_DESC" property="desc"/>
+        <result column="OPERATION_CODE" property="code"/>
+        <result column="RESOURCE_BELONG_TYPE" property="resourceBelongType"/>
+    </resultMap>
+
+    <sql id="sql">
+	    RESOURCE_ID,
+	    RESOURCE_PARENT_ID,
+	    RESOURCE_CREATETIME,
+	    RESOURCE_SORT,
+	    RESOURCE_NAME,
+	    RESOURCE_ADDRESS,
+	    RESOURCE_LEVEL,
+	    RESOURCE_TYPE,
+	    RESOURCE_DESC,
+	    RESOURCE_CODE,
+	    RESOURCE_PATH,
+	    RESOURCE_BELONG_TYPE <!-- 2019年1月17日  -->
+    </sql>
+
+    <insert id="insert" parameterType="com.sinosoft.ap.system.resourcemanage.domain.ResourceEntity">
+        INSERT INTO APS_RESOURCE(<include refid="sql"/>) VALUES
+        (
+        #{resourceId},
+        #{resourceParentId},
+        #{resourceCreatetime},
+        #{resourceSort},
+        #{resourceName},
+        #{resourceAddress},
+        #{resourceLevel},
+        #{resourceType},
+        #{resourceDesc},
+        #{resourceCode},
+        #{resourcePath},
+        #{resourceBelongType}  <!-- 2019年1月17日  -->
+        );
+    </insert>
+
+    <delete id="delete" parameterType="com.sinosoft.ap.system.resourcemanage.domain.ResourceEntity">
+        DELETE FROM APS_RESOURCE
+        WHERE
+        1=1
+        <if test="resourceId != null">
+            AND RESOURCE_ID = #{resourceId}
+        </if>
+        <if test="resourceParentId != null">
+            AND RESOURCE_PARENT_ID = #{resourceParentId}
+        </if>
+        <if test="resourceCreatetime != null">
+            AND RESOURCE_CREATETIME = #{resourceCreatetime}
+        </if>
+        <if test="resourceSort != null">
+            AND RESOURCE_SORT = #{resourceSort}
+        </if>
+        <if test="resourceName != null">
+            AND RESOURCE_NAME = #{resourceName}
+        </if>
+        <if test="resourceAddress != null">
+            AND RESOURCE_ADDRESS = #{resourceAddress}
+        </if>
+        <if test="resourceLevel != null">
+            AND RESOURCE_LEVEL = #{resourceLevel}
+        </if>
+        <if test="resourceType != null">
+            AND RESOURCE_TYPE = #{resourceType}
+        </if>
+        <if test="resourceDesc != null">
+            AND RESOURCE_DESC = #{resourceDesc}
+        </if>
+        <if test="resourceCode != null">
+            AND RESOURCE_CODE = #{resourceCode}
+        </if>
+        <if test="resourcePath != null">
+            AND RESOURCE_PATH = #{resourcePath}
+        </if>
+        <!-- 2019年1月17日  -->
+		<if test="resourceBelongType != null and resourceBelongType != ''">
+            AND RESOURCE_BELONG_TYPE =#{resourceBelongType}
+        </if>
+    </delete>
+
+    <update id="update" parameterType="com.sinosoft.ap.system.resourcemanage.domain.ResourceEntity">
+        UPDATE APS_RESOURCE
+        <trim prefix="SET" prefixOverrides=",">
+            <if test="resourceCreatetime != null">
+                ,RESOURCE_CREATETIME =#{resourceCreatetime}
+            </if>
+            <if test="resourceSort != null">
+                ,RESOURCE_SORT =#{resourceSort}
+            </if>
+            <if test="resourceName != null">
+                ,RESOURCE_NAME =#{resourceName}
+            </if>
+            <if test="resourceAddress != null">
+                ,RESOURCE_ADDRESS =#{resourceAddress}
+            </if>
+            <if test="resourceLevel != null">
+                ,RESOURCE_LEVEL =#{resourceLevel}
+            </if>
+            <if test="resourceType != null">
+                ,RESOURCE_TYPE =#{resourceType}
+            </if>
+            <if test="resourceDesc != null">
+                ,RESOURCE_DESC =#{resourceDesc}
+            </if>
+            <!-- 2019年1月17日  -->
+		    <if test="resourceBelongType != null and resourceBelongType != ''">
+                ,RESOURCE_BELONG_TYPE =#{resourceBelongType}
+            </if>
+        </trim>
+        where
+        RESOURCE_ID = #{resourceId}
+    </update>
+
+    <select id="select" resultMap="baseMap" parameterType="com.sinosoft.ap.system.resourcemanage.domain.ResourceEntity">
+        SELECT
+        	APS_RESOURCE.RESOURCE_ID,
+        	APS_RESOURCE.RESOURCE_PARENT_ID,
+        	APS_RESOURCE.RESOURCE_CREATETIME,
+        	APS_RESOURCE.RESOURCE_SORT,
+        	APS_RESOURCE.RESOURCE_NAME,
+        	APS_RESOURCE.RESOURCE_ADDRESS,
+        	APS_RESOURCE.RESOURCE_LEVEL,
+        	APS_RESOURCE.RESOURCE_TYPE,
+        	APS_RESOURCE.RESOURCE_DESC,
+        	APS_RESOURCE.RESOURCE_CODE,
+        	APS_RESOURCE.RESOURCE_PATH,
+        	APS_RESOURCE.RESOURCE_BELONG_TYPE
+        from APS_RESOURCE
+        WHERE
+        1=1
+        <if test="resourceId != null">
+            AND RESOURCE_ID =#{resourceId}
+        </if>
+        <if test="resourceParentId != null">
+            AND RESOURCE_PARENT_ID =#{resourceParentId}
+        </if>
+        <if test="resourceCreatetime != null">
+            AND RESOURCE_CREATETIME =#{resourceCreatetime}
+        </if>
+        <if test="resourceSort != null">
+            AND RESOURCE_SORT =#{resourceSort}
+        </if>
+        <if test="resourceName != null">
+            AND RESOURCE_NAME =#{resourceName}
+        </if>
+        <if test="resourceAddress != null">
+            AND RESOURCE_ADDRESS =#{resourceAddress}
+        </if>
+        <if test="resourceLevel != null">
+            AND RESOURCE_LEVEL =#{resourceLevel}
+        </if>
+        <if test="resourceType != null">
+            AND RESOURCE_TYPE =#{resourceType}
+        </if>
+        <if test="resourceDesc != null">
+            AND RESOURCE_DESC =#{resourceDesc}
+        </if>
+        <if test="resourceCode != null">
+            AND RESOURCE_CODE = #{resourceCode}
+        </if>
+        <if test="resourcePath != null">
+            AND RESOURCE_PATH = #{resourcePath}
+        </if>
+        <if test="resourceBelongType != null and resourceBelongType != '' ">
+            AND RESOURCE_BELONG_TYPE = #{resourceBelongType}
+        </if>
+        ORDER BY RESOURCE_SORT
+    </select>
+    <select id="selectResourceIcon" resultMap="IconMap" parameterType="java.util.List">
+        select
+        APS_RESOURCE.RESOURCE_ID,
+        APS_RESOURCE.RESOURCE_PARENT_ID,
+        APS_RESOURCE.RESOURCE_CREATETIME,
+        APS_RESOURCE.RESOURCE_SORT,
+        APS_RESOURCE.RESOURCE_NAME,
+        APS_RESOURCE.RESOURCE_ADDRESS,
+        APS_RESOURCE.RESOURCE_LEVEL,
+        APS_RESOURCE.RESOURCE_TYPE,
+        APS_RESOURCE.RESOURCE_DESC,
+        APS_RESOURCE.RESOURCE_CODE,
+        APS_RESOURCE.RESOURCE_PATH,
+        APS_RESOURCE_ICON.RESOURCE_ICON_ID,
+        APS_RESOURCE_ICON.RESOURCE_ICON_ADDRESS,
+        APS_RESOURCE.RESOURCE_BELONG_TYPE
+        from
+        APS_RESOURCE
+        left join APS_RESOURCE_ICON_REL on APS_RESOURCE_ICON_REL.RESOURCE_ID = APS_RESOURCE.RESOURCE_ID
+        left join APS_RESOURCE_ICON on APS_RESOURCE_ICON.RESOURCE_ICON_ID = APS_RESOURCE_ICON_REL.RESOURCE_ICON_ID
+        where
+        1=1
+        <if test="list != null">
+            AND APS_RESOURCE.RESOURCE_ID in
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        order by APS_RESOURCE.RESOURCE_SORT
+    </select>
+
+    <select id="selectResourceTree" resultMap="resourceTree">
+    select 
+		APS_RESOURCE.RESOURCE_ID,
+	    RESOURCE_PARENT_ID,
+	    RESOURCE_CREATETIME,
+	    RESOURCE_SORT,
+	    RESOURCE_NAME,
+	    RESOURCE_ADDRESS,
+	    RESOURCE_TYPE,
+	    RESOURCE_DESC,
+	    RESOURCE_CODE,
+        RESOURCE_PATH,
+	    RESOURCE_ICON_ADDRESS,
+	    APS_RESOURCE.RESOURCE_BELONG_TYPE
+    from APS_RESOURCE
+    left join APS_RESOURCE_ICON_REL on APS_RESOURCE_ICON_REL.RESOURCE_ID = APS_RESOURCE.RESOURCE_ID
+	left join APS_RESOURCE_ICON on APS_RESOURCE_ICON.RESOURCE_ICON_ID = APS_RESOURCE_ICON_REL.RESOURCE_ICON_ID
+    </select>
+    <select id="selectOperationTree" resultMap="operationTree">
+    select 
+		RESOURCE_ID,
+	    OPERATION_ID,
+	    OPERATION_NAME,
+	    OPERATION_DESC,
+	    OPERATION_CODE
+    from APS_OPERATION
+    order by OPERATION_TIME
+    </select>
+
+</mapper>

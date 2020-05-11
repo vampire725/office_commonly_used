@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.permissionrolerel.domain.PermissionOrganRelRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.permissionrolerel.domain.PermissionOrganRelEntity">
+	    <result column="ORGAN_ID" property="organId" />
+	    <result column="PERMISSION_ID" property="permissionId" />
+    </resultMap>
+
+    <sql id="sql">
+	    ORGAN_ID,
+	    PERMISSION_ID
+    </sql>
+
+	<insert id="insert" parameterType="com.sinosoft.ap.system.permissionrolerel.domain.PermissionOrganRelEntity">
+		INSERT INTO APS_PERMISSION_ORGAN_REL(<include refid="sql" />) VALUES
+		(
+	    #{organId},
+	    #{permissionId}
+		);
+	</insert>
+
+	<delete id="delete" parameterType="com.sinosoft.ap.system.permissionrolerel.domain.PermissionOrganRelEntity">
+		DELETE FROM APS_PERMISSION_ORGAN_REL 
+		WHERE
+		1=1
+		<if test ="organId != null">
+		AND ORGAN_ID = #{organId}
+		</if>
+		<if test ="permissionId != null">
+		AND PERMISSION_ID = #{permissionId}
+		</if>
+	</delete>
+
+	
+    <select id="select" resultMap="baseMap" parameterType="com.sinosoft.ap.system.permissionrolerel.domain.PermissionOrganRelEntity">
+        SELECT <include refid="sql" /> from  APS_PERMISSION_ORGAN_REL
+        WHERE
+        1=1
+		<if test ="organId != null">
+		AND ORGAN_ID =#{organId}
+		</if>	
+		<if test ="permissionId != null">
+		AND PERMISSION_ID =#{permissionId}
+		</if>	
+    </select>
+</mapper>

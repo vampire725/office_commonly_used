@@ -1,0 +1,9 @@
+setup.conf：配置文件，包含了图数据库ip等信息
+data文件夹：包括了测试、分词相关的数据
+excelReader文件夹：excelReader.py：读取excel文件
+neo4j文件夹：connector.py：用于连接Neo4j图数据库的工具类
+annotation文件夹：标注平台解析模块
+harmful文件夹：有害识别模块
+harmful_graph：有害图谱导入脚本
+universalKg：通用图谱导入脚本
+rules文件夹：有害识别规则文件

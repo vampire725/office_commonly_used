@@ -1,0 +1,63 @@
+# 设置证书啥的
+openssl req -newkey rsa:4096 -nodes -sha256 -keyout /opt/docker/registry/certs/domain.key -x509 -days 365 -out /opt/docker/registry/certs/domain.crt
+
+## 注意
+centos 文件地址：/etc/pki/tls/
+ubuntu文件地址：/usr/lib/ssl
+编辑openssl.cnf,在[v3_ca]下面添加：subjectAltName = IP:域名|IP地址
+[ v3_ca ]
+subjectAltName = IP:所在服务器IP
+然后填地区啥的一定要认真，要不然也不会生效，比如：CN BeiJing ip:port啥的
+
+
+
+
+# 设置docker仓库用户密码
+docker run --entrypoint htpasswd registry:latest -Bbn admin asd1234 > /opt/docker/registry/auth/htpasswd
+
+
+# 启动正经仓库
+
+docker run -d --name poc-registry -p 8888:5000 -v /opt/docker/registry/auth:/auth -v /opt/data/registry:/var/lib/registry -e "REGISTRY_AUTH=htpasswd" -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd -v /opt/docker/registry/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:latest
+
+# remote端口复制证书
+scp -p /opt/docker/registry/certs/domain.crt root@192.168.129.10:/etc/docker/certs.d/111.33.152.130\:10167/ca.crt
+scp -P 10122 root@111.33.152.130:/opt/docker/registry/certs/domain.crt /etc/docker/certs.d/111.33.152.130\:10167/ca.crt
+scp -P 10122 root@111.33.152.130:/home/gpp/dont_touch/lern/to_u/sxf/file ./
+
+# 查看所有镜像
+curl --cacert /etc/docker/certs.d/10.20.10.100:8888/ca.crt -XGET https://10.20.10.100:8888/v2/_catalog --user admin
+# 查看镜像及版本
+curl --cacert /etc/docker/certs.d/10.20.10.100:8888/ca.crt -XGET https://10.20.10.100:8888/v2/python/tags/list --user admin
+
+
+
+#查询镜像
+curl  <仓库地址>/v2/_catalog
+
+#查询镜像tag(版本)
+curl  <仓库地址>/v2/<镜像名>/tags/list
+
+#删除镜像API
+curl --cacert /etc/docker/certs.d/10.20.10.100:8888/ca.crt -I -X DELETE https://10.20.10.100:8888/v2/bala2//manifests/sha256:80f23ed963ca2a7fe09497e71a7db44df4586dbdb74748185d2f993384ab8147
+
+curl --cacert /etc/docker/certs.d/10.20.10.100:8888/ca.crt -v --silent -H "Accept: application/vnd.docker.distribution.manifest.v2+json" -X GET  https://10.20.10.100:8888/v2/bala2/manifests/IMAGE_TAG-stable --user 2>&1 | grep Docker-Content-Digest | awk '{print ($3)}'
+
+#获取镜像digest_hash
+curl --cacert /etc/docker/certs.d/10.20.10.100:8888/ca.crt -XGET https://10.20.10.100:8888/v2/bala2/manifests/IMAGE_TAG-stable \
+    --header "Accept: application/vnd.docker.distribution.manifest.v2+json" --user admin
+
+
+
+
+sudo mkdir -p  /etc/docker/certs.d/192.168.129.112\:10001/
+sudo chmod 777 /etc/docker/certs.d/192.168.129.112\:10001/
+scp -p /etc/docker/certs.d/192.168.129.112\:10001/ca.crt rancher@192.168.129.130:/etc/docker/certs.d/192.168.129.112\:10001/ca.crt
+
+scp -p rancher@192.168.129.112:/etc/docker/certs.d/192.168.129.112\:10001/ca.crt /etc/docker/certs.d/192.168.129.112\:10001/ca.crt
+
+docker login 192.168.129.112:10001 -u admin -p asd123
+
+(rancher@192.168.129.110 密码：1qaz2WSX3edc4RFV)
+
+

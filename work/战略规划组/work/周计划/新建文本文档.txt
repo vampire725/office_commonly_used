@@ -1,0 +1,11 @@
+组	跳板机	服务器
+		Docker测试机
+		K8s集群（生产）
+		K8s集群（测试）
+		存储/中间件
+		传统应用服务器
+quay-mirror.qiniu.com/travelaudience/docker-nexus:3.17.0
+quay.azk8s.cn/travelaudience/docker-nexus:3.17.0
+quay.mirrors.ustc.edu.cn/travelaudience/docker-nexus:3.17.0
+quay.io/travelaudience/docker-nexus:3.17.0
+quay.azk8s.cn/travelaudience/docker-nexus-proxy:2.5.0

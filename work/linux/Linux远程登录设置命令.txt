@@ -1,0 +1,45 @@
+sshpass -p 1qaz2WSX3edc4RFV ssh-copy-id rancher@192.168.129.110
+sshpass -p 1qaz2WSX3edc4RFV ssh-copy-id rancher@192.168.129.111
+sshpass -p 1qaz2WSX3edc4RFV ssh-copy-id rancher@192.168.129.112
+sshpass -p 1qaz2WSX3edc4RFV ssh-copy-id rancher@192.168.129.113
+sshpass -p 1qaz2WSX3edc4RFV ssh-copy-id rancher@192.168.129.114
+sshpass -p 1qaz2WSX3edc4RFV ssh-copy-id rancher@192.168.129.115
+sshpass -p 1qaz2WSX3edc4RFV ssh-copy-id rancher@10.20.10.117
+
+
+
+ssh-keygen
+
+sudo apt install sshpass
+
+sudo vi /etc/ssh/ssh_config
+StrictHostKeyChecking no
+				
+ rm .ssh/known_hosts
+
+
+cd /etc/ssh/
+> sshd_config
+vi sshd_config
+
+
+systemctl restart sshd.service
+## ssh免密条件
+eg:
+
+
+GSSAPIAuthentication no
+PasswordAuthentication yes
+
+#添加
+RSAAuthentication yes
+PubkeyAuthentication yes
+
+# 文件/夹 权限
+touch /home/rancher/.ssh/authorized_keys 
+sudo chown -R rancher:rancher /home/rancher
+sudo chmod 700 /home/rancher
+sudo chmod 700 /home/rancher/.ssh
+sudo chmod 644 /home/rancher/.ssh/authorized_keys  
+sudo chmod 600 /home/rancher/.ssh/id_rsa 
+

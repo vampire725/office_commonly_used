@@ -1,0 +1,46 @@
+1. 以下命令没有先后之分，以后再解决
+
+# 设定用户
+git config --global user.email "guopanpan@sinosoft.com.cn"
+git config --global user.name "gpp"
+
+# 给版本库添加远程仓库，从远程仓库同步代码
+git remote add <name> <address>
+git remote add Jason https://git.oschina.net/XXXX
+
+git pull  <address>
+git pull https://git.oschina.net/xxxx
+
+
+# github 初始化参考
+
+echo "# office_commonly_used" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/gpp0725/office_commonly_used.git
+git push -u origin master
+
+
+# push之前pull
+
+git pull origin master
+
+# 提交
+git add .
+git commit -m ""
+
+# 合并覆盖当前
+
+git reset --hard
+
+git pull origin dev-yokai
+
+# 忽略或者格式化CRLF操作
+
+find . -type f -exec dos2unix {} +
+
+git config --global core.autocrlf input
+git config --global core.safecrlf true
+也就是让代码仓库使用统一的换行符(LF)，如果代码中包含 CRLF 类型的文件时将无法提交，
+需要用 dos2unix 或者其他工具手动转换文件类型。当然，可以根据自己的需要进行更为合适的配置！

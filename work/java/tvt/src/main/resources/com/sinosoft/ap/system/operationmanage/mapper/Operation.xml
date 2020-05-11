@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.operationmanage.domain.OperationRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.operationmanage.domain.OperationEntity">
+	    <result column="RESOURCE_ID" property="resourceId" />
+	    <result column="OPERATION_ID" property="operationId" />
+	    <result column="OPERATION_NAME" property="operationName" />
+	    <result column="OPERATION_TIME" property="operationTime" />
+	    <result column="OPERATION_DESC" property="operationDesc" />
+	    <result column="OPERATION_CODE" property="operationCode" />
+    </resultMap>
+
+    <sql id="sql">
+	    RESOURCE_ID,
+	    OPERATION_ID,
+	    OPERATION_NAME,
+	    OPERATION_TIME,
+	    OPERATION_DESC,
+	    OPERATION_CODE
+    </sql>
+
+	<insert id="insert" parameterType="com.sinosoft.ap.system.operationmanage.domain.OperationEntity">
+		INSERT INTO APS_OPERATION(<include refid="sql" />) VALUES
+		(
+	    #{resourceId},
+	    #{operationId},
+	    #{operationName},
+	    #{operationTime},
+	    #{operationDesc},
+	    #{operationCode}
+		);
+	</insert>
+
+	<delete id="delete" parameterType="com.sinosoft.ap.system.operationmanage.domain.OperationEntity">
+		DELETE FROM APS_OPERATION 
+		<if test ="permissionId != null">
+	    join APS_PERMISSION_OPERATION_REL
+	    on APS_OPERATION.OPERATION_ID = APS_PERMISSION_OPERATION_REL.OPERETION_ID
+		</if>
+		WHERE
+		1=1
+		<if test ="resourceId != null">
+		AND RESOURCE_ID = #{resourceId}
+		</if>
+		<if test ="operationId != null">
+		AND OPERATION_ID = #{operationId}
+		</if>
+		<if test ="operationName != null">
+		AND OPERATION_NAME = #{operationName}
+		</if>
+		<if test ="operationTime != null">
+		AND OPERATION_TIME = #{operationTime}
+		</if>
+		<if test ="operationDesc != null">
+		AND OPERATION_DESC = #{operationDesc}
+		</if>
+		<if test ="operationCode != null">
+		AND OPERATION_CODE = #{operationCode}
+		</if>
+		<if test ="permissionId != null">
+		AND APS_PERMISSION_OPERATION_REL.PERMISSION_ID =#{permissionId}
+		</if>	
+	</delete>
+
+	<update id="update" parameterType="com.sinosoft.ap.system.operationmanage.domain.OperationEntity">
+		UPDATE APS_OPERATION  
+		<trim prefix="SET" prefixOverrides=",">
+		<if test ="operationName != null">
+		,OPERATION_NAME =#{operationName}
+		</if>		
+		<if test ="operationTime != null">
+		,OPERATION_TIME =#{operationTime}
+		</if>		
+		<if test ="operationDesc != null">
+		,OPERATION_DESC =#{operationDesc}
+		</if>
+		<if test ="operationCode != null">
+		,OPERATION_CODE =#{operationCode}
+		</if>
+		</trim>		
+		<trim prefix="where" prefixOverrides="AND">
+		<if test ="resourceId != null">
+		AND RESOURCE_ID = #{resourceId}
+		</if>
+		<if test ="operationId != null">
+		AND OPERATION_ID = #{operationId}
+		</if>
+		</trim>		
+	</update>
+	
+    <select id="select" resultMap="baseMap" parameterType="com.sinosoft.ap.system.operationmanage.domain.OperationEntity">
+        SELECT 
+		APS_OPERATION.RESOURCE_ID,
+	    APS_OPERATION.OPERATION_ID,
+	    APS_OPERATION.OPERATION_NAME,
+	    APS_OPERATION.OPERATION_TIME,
+	    APS_OPERATION.OPERATION_DESC,
+	    APS_OPERATION.OPERATION_CODE from  APS_OPERATION
+	    <if test ="permissionId != null">
+	    join APS_PERMISSION_OPERATION_REL
+	    on APS_OPERATION.OPERATION_ID = APS_PERMISSION_OPERATION_REL.OPERETION_ID
+		</if>
+        WHERE
+        1=1
+		<if test ="resourceId != null">
+		AND APS_OPERATION.RESOURCE_ID =#{resourceId}
+		</if>	
+		<if test ="operationId != null">
+		AND APS_OPERATION.OPERATION_ID =#{operationId}
+		</if>	
+		<if test ="operationName != null">
+		AND APS_OPERATION.OPERATION_NAME =#{operationName}
+		</if>	
+		<if test ="operationTime != null">
+		AND APS_OPERATION.OPERATION_TIME =#{operationTime}
+		</if>	
+		<if test ="operationDesc != null">
+		AND APS_OPERATION.OPERATION_DESC =#{operationDesc}
+		</if>	
+		<if test ="operationCode != null">
+		AND APS_OPERATION.OPERATION_CODE =#{operationCode}
+		</if>
+		<if test ="permissionId != null">
+		AND APS_PERMISSION_OPERATION_REL.PERMISSION_ID =#{permissionId}
+		</if>	
+    </select>
+    
+    <select id="selectByPermissionId"  resultMap="baseMap" parameterType="java.util.List" >
+    	select * from APS_OPERATION
+    	join APS_PERMISSION_OPERATION_REL on APS_OPERATION.OPERATION_ID = APS_PERMISSION_OPERATION_REL.OPERETION_ID
+    	where 
+    	APS_PERMISSION_OPERATION_REL.PERMISSION_ID in 
+    	<foreach close=")" collection="list" index="index" item="item" open="(" separator=",">  
+            #{item}  
+        </foreach> 
+    </select>
+</mapper>

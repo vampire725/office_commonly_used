@@ -1,0 +1,117 @@
+[program:elasticsearch]
+command=/usr/local/janusgraph0.2/elasticsearch/bin/elasticsearch
+directory=/usr/local/janusgraph0.2/elasticsearch
+startsecs=10
+stopwaitsecs=5
+autostart=false
+autorestart=true
+stdout_logfile=/var/log/supervisor/elasticsearch.log
+stderr_logfile=/var/log/supervisor/elasticsearch.err
+
+
+
+[program:obtain_url]
+command=/usr/bin/python3  /opt/toutiao/toutiao_headline/obtain_url.py
+startsecs=10
+stopwaitsecs=5
+autostart=false
+autorestart=true
+stdout_logfile=/var/log/supervisor/new_url.log
+stderr_logfile=/var/log/supervisor/new_url.err
+
+
+[program:toutiao_content]
+command=/usr/bin/python3  /opt/toutiao/toutiao_headline/starthh.py
+startsecs=10
+stopwaitsecs=5
+autostart=false
+autorestart=true
+stdout_logfile=/var/log/supervisor/toutiao_content.log
+stderr_logfile=/var/log/supervisor/toutiao_content.err
+
+
+
+
+
+
+
+
+
+[unix_http_server]
+file=/etc/supervisor/tmp/supervisor.sock   ; the path to the socket file
+
+
+[inet_http_server]         ; inet (TCP) server disabled by default
+port=0.0.0.0:9003        ; ip_address:port specifier, *:port for all iface
+
+[supervisord]
+logfile=/etc/supervisor/tmp/supervisord.log ; main log file; default $CWD/supervisord.log
+logfile_maxbytes=5000MB        ; max main logfile bytes b4 rotation; default 50MB
+logfile_backups=10           ; # of main logfile backups; 0 means none, default 10
+loglevel=warn                ; log level; default info; others: debug,warn,trace
+pidfile=/etc/supervisor/tmp/supervisord.pid ; supervisord pidfile; default supervisord.pid
+nodaemon=false               ; start in foreground if true; default false
+minfds=1024                  ; min. avail startup file descriptors; default 1024
+minprocs=200                 ; min. avail process descriptors;default 200
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix:///etc/supervisor/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
+
+[include]
+files = directory/*.ini
+
+
+
+
+
+
+
+
+[unix_http_server]
+file=/tmp/supervisor.sock   ; (the path to the socket file)
+
+
+[inet_http_server]         ; inet (TCP) server disabled by default
+port=127.0.0.1:9003        ; (ip_address:port specifier, *:port for all iface)
+;username=user              ; (default is no username (open server))
+;password=123               ; (default is no password (open server))
+
+[supervisord]
+logfile=/tmp/supervisord.log ; (main log file;default $CWD/supervisord.log)
+logfile_maxbytes=5000MB        ; (max main logfile bytes b4 rotation;default 50MB)
+logfile_backups=10           ; (num of main logfile rotation backups;default 10)
+loglevel=info                ; (log level;default info; others: debug,warn,trace)
+pidfile=/tmp/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
+nodaemon=false               ; (start in foreground if true;default false)
+minfds=1024                  ; (min. avail startup file descriptors;default 1024)
+minprocs=200                 ; (min. avail process descriptors;default 200)
+
+
+[supervisorctl]
+serverurl=unix:///tmp/supervisor.sock ; use a unix:// URL  for a unix socket
+
+
+[include]
+files = directory/*.ini
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

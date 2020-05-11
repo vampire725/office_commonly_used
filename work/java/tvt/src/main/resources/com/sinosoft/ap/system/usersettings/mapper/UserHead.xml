@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.sinosoft.ap.system.usersettings.domain.UserHeadRepository">
+    <resultMap id="baseMap" type="com.sinosoft.ap.system.usersettings.domain.UserHeadEntity">
+	    <result column="USER_ID" property="userId" />
+	    <result column="USER_HEAD_ID" property="userHeadId" />
+	    <result column="USER_HEAD_ADDRESS" property="userHeadAddress" />
+    </resultMap>
+
+    <sql id="sql">
+	    USER_ID,
+	    USER_HEAD_ID,
+	    USER_HEAD_ADDRESS
+    </sql>
+
+	<insert id="insert" parameterType="com.sinosoft.ap.system.usersettings.domain.UserHeadEntity">
+		INSERT INTO APS_USER_HEAD(<include refid="sql" />) VALUES
+		(
+	    #{userId},
+	    #{userHeadId},
+	    #{userHeadAddress}
+		);
+	</insert>
+
+	<delete id="delete" parameterType="com.sinosoft.ap.system.usersettings.domain.UserHeadEntity">
+		DELETE FROM APS_USER_HEAD 
+		WHERE
+		1=1
+		<if test ="userId != null">
+		AND USER_ID = #{userId}
+		</if>
+		<if test ="userHeadId != null">
+		AND USER_HEAD_ID = #{userHeadId}
+		</if>
+		<if test ="userHeadAddress != null">
+		AND USER_HEAD_ADDRESS = #{userHeadAddress}
+		</if>
+	</delete>
+
+	<update id="update" parameterType="com.sinosoft.ap.system.usersettings.domain.UserHeadEntity">
+		UPDATE APS_USER_HEAD  
+		
+		<if test ="userHeadAddress != null">
+		USER_HEAD_ADDRESS =#{userHeadAddress}
+		</if>		
+		where 
+		USER_ID = #{userId}
+	</update>
+	
+    <select id="select" resultMap="baseMap" parameterType="com.sinosoft.ap.system.usersettings.domain.UserHeadEntity">
+        SELECT <include refid="sql" /> from  APS_USER_HEAD
+        WHERE
+        1=1
+		<if test ="userId != null">
+		AND USER_ID =#{userId}
+		</if>	
+		<if test ="userHeadId != null">
+		AND USER_HEAD_ID =#{userHeadId}
+		</if>	
+		<if test ="userHeadAddress != null">
+		AND USER_HEAD_ADDRESS =#{userHeadAddress}
+		</if>	
+    </select>
+</mapper>

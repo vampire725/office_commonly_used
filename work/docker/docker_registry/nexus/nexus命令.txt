@@ -1,0 +1,42 @@
+10652-10662     8888-8898
+8888 10652
+8889 10653
+8890 10654
+8891 10655
+8892 10656
+8893 10657
+8894 10658
+8895 10659
+8896 10660
+8897 10661
+8898 10662
+
+http://111.33.152.130:10653/
+
+mkdir /home/rancher/nexus-data && chown -R 200 /home/rancher/nexus-data
+docker run -d -p 8889:8081 -p 8890:8890 -p 8891:8891 -p 10656:8892 --name nexus -v /home/rancher/nexus-data:/nexus-data sonatype/nexus3
+
+
+docker run -d -p 8889:8081 -p 8890:8890 -p 8891:8891 -p 8083:8083 --name nexus -v /home/rancher/nexus-data:/nexus-data sonatype/nexus3
+
+docker run -it --rm -e JAVA_OPTS=-Xmx512m  plajko/keytool
+
+
+keytool -genkeypair -keystore keystore.jks -storepass password -keypass password -alias jetty -keyalg RSA -keysize 2048 -validity 5000 -dname "CN=*.faii.com.cn, OU=Example, O=Sonatype, L=Unspecified, ST=Unspecified, C=US" -ext "SAN=DNS:faii.com.cn,IP:111.33.152.130" -ext "BC=ca:true"
+
+keytool -printcert -sslserver faii.com.cn:10656 -rfc
+
+
+
+
+${jetty.etc}/jetty-https.xml${jetty.etc}/jetty-https.xml
+nexus-args=${jetty.etc}/jetty.xml,${jetty.etc}/jetty-http.xml,${jetty.etc}/jetty-https.xml,${jetty.etc}/jetty-requestlog.xml
+
+nexus-args=${jetty.etc}/jetty.xml,${jetty.etc}/jetty-http.xml,${jetty.etc}/jetty-https.xml,${jetty.etc}/jetty-requestlog.xml
+
+
+<Set name="KeyStorePath"><Property name="ssl.etc"/>/keystore.jks</Set>
+<Set name="KeyStorePassword">asd123</Set>
+<Set name="KeyManagerPassword">asd123</Set>
+<Set name="TrustStorePassword">asd123</Set>
+

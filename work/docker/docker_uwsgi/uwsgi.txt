@@ -1,0 +1,135 @@
+yum groupinstall "Development Tools"
+yum install python 
+yum install python-devel
+yum -y install epel-release
+yum -y install python-pip
+yum -y install nginx
+
+touch mysite.conf   /etc/nginx/conf.d
+
+server { listen 80; 
+	server_name localhost;
+	 location / { include uwsgi_params; 
+	uwsgi_pass uwsgi.app:9090; } } 
+
+server {
+  listen 8000;  
+  server_name localhost;  
+  location / {
+    include /etc/nginx/uwsgi_params;
+    uwsgi_pass 127.0.0.1:8001;  
+  }
+
+  location /static/ {
+    alias /opt/testdjango/static/;    
+  }
+}
+
+
+
+
+
+项目根目录下 uwsgi.ini
+
+[uwsgi]
+# Django's wsgi file
+module = /opt/mysite/mysite.wsgi
+socket = 0.0.0.0:8001
+pidfile = /opt/uwsgi.pid
+daemonize = /opt/uwsgi.log
+
+[uwsgi]
+socket = 0.0.0.0:8001
+chdir = /opt/mysite/
+module = mysite.wsgi
+#wsgi-file = mysite/wsgi.py
+enable-threads = true
+processes = 2
+threads = 2
+#stats = 0.0.0.0:8000
+buffer-size = 65536
+evil-reload-on-rss = 256
+evil-reload-on-as = 256
+chmod-socket    = 664
+uid = www-data
+gid = www-data
+
+
+wsgi.py
+
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
+
+
+
+uwsgi --ini uwsgi.ini
+enterypoint ["uwsgi", "--ini", "uwsgi.ini"]
+uwsgi --http: 8000 --module testjango.wsgi --ini uwsgi.ini
+
+/bin/bash -c echo 'hello cmd!'
+
+cmd ["/bin/bash", "-c", "echo 'hello cmd!'"]
+cmd nginx -g daemon off
+
+
+
+
+
+
+
+
+server {
+  listen 8000;  
+  #server_name localhost;  
+  location / {
+    include /etc/nginx/uwsgi_params;
+    uwsgi_pass 0.0.0.0:8001;  
+  }
+
+  location /static/ {
+    alias /opt/mysite/static/;    
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
