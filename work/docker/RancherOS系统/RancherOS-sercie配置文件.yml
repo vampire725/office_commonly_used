@@ -1,27 +1,111 @@
-gitlab:
-    image: gitlab/gitlab-ce:8.17.3-ce.0
-    ports:
-      - "2525:2525"
-    volumes:
-      - /opt/gitlab/config:/etc/gitlab
-      - /opt/gitlab/logs:/var/log/gitlab
-      - /opt/gitlab/data:/var/opt/gitlab
-    environment:
-      GITLAB_OMNIBUS_CONFIG: |
-        external_url 'http://111.33.152.130:2525'
-        gitlab_rails['backup_keep_time']=259,200
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-gitlab_runner:
-  image: gitlab/gitlab-runner:latest
-  volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-    - /opt/opt/gitlab-runner/config:/etc/gitlab-runner
-  depends_on:
-    - "gitlab"
-  deploy:
-    replicas: 1
-    restart_policy:
-      condition: on-failure
+hostname: ros-t
+
+rancher:
+  #   switch from default/alpine/centos/debian/fedora/ubuntu(18lts now)
+  console: ubuntu
+
+  bootstrap_docker:
+    registry_mirror: "https://hub-mirror.c.163.com/"
+  system_docker:
+    registry_mirror: "https://hub-mirror.c.163.com/"
+  docker:
+    registry_mirror: "https://hub-mirror.c.163.com/"
+
+  network:
+    interfaces:
+      eth0:
+        address: xxx.xxx.xxx.xxx/24
+        netmask: 255.255.255.0
+        broadcast: 192.168.129.255
+        gateway: xxx.xxx.xxx.xxx
+        mtu: 1500
+        dhcp: false
+    dns:
+      nameservers:
+        - 211.137.160.5
+        - 114.114.114.114
+
+  # resize_device: /dev/sda
+
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9JvZwYAYu8VxqKuqE+FKvgiPPCxdDtNhmRb3p/BS8OQC8eiiVR6an2tdfyiGAMOJQolwHDmnC/n7GeenL/cmeEPXR6rBxOadNggadjChW1hOUxt30CdyxPOHacuE4OYcV2dOdOwDq9ErEKGVPnqoaJtqQxUFp0lHf6LgrLv63+UwVuh/KVykoEK2mgrsCJ0G6No/DcrZO2Ebxwg5NTeWioM/LCQnCHRf2kOsEYqD/2LsGaxAIcxtgAPOmnQFqsFe3XVnoB5VWMVsv917UdMGanShc8bv8GacDEZKbPlweWOIpaJ74PMaslQaKkG06DkF5fR3K7ag56+o5Uxz+ab7B sz@Sz-Surface
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDfyndr7AfYYVafpgcFh2N7MPdT7iaoZw1rZrpxpFYWgbqd7xBeLJ19+avnBI/2VlZUCTk3ycE2VgyG6LJxQ6p7hEOqW87bFUfQMDtDXlABL+UpUnOdALo0FgeLka4/D+44PUDw0dVc7b17r97l7ppu1MhV7HxG2t5izpgUT0J2XQvNcjCn4d/opbtxCZlP4yMPmwDSyTfp41292+iK6461p2kTLO0v0Abb42RXjdzlq6feIlS0ih+k5F+Ue0VCz94mykaqai/VjaBu8fmKQ60FS89halU89e9OuiDs7PVuvWNX5RWlqISRjA+S7JrfqaJbblmqPgkR04Z4Iyptc9pN sz@Sz-clevo
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLA19lHlh7N8dTca78pL+f7lmk5T2K3cvgwrs05lClnd/ZHVQAVG6BeCgKRptQQL6NJfwCEH8Oqawvi+iauavsgHbrfmsphDJXG6heqZ5w+10b5YCNlndKaHkvui/0MmQerqqi8znjjQvbEmbC8WOqZzGcDrJup2NeGKqbRAWLKS9OYk5BigxaVQdWAXXBdYEiZhHN6T4ddl5Kn7pFVvkO6Me4ENzBkSbSJWoUKznHvJKFzc+kcZKHMN95tzCaGkoQUDWM52+v3qq3VMA9eIAw20raaNmlfEWdLSpCQsIW2vj1au8bUrhbohJsTkmGy1TLFkdOwSTnKnE7DUtwBG+F root@gpp-MSI
+  - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEA2HxO7KCOH3exSar0CI6qlNiud4L5WwCCOkPbHaoknTIXTIEPkKKAD1VaZ6+1sA03Vcwld2jPIMaWqe8SPiU3+Za+rS/DjsvRsRjVbYHAX/Klpm8BIgqNI3wENQpRyxNDvNq3tQj6P490Jgs7evCVLgjn62Pj9jDcNktiItaWf6U=
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDaN2bkaXS5Sc63bQFS/SufBStUcNBGr48ZuyfZBUW+AqPJj86pQMqHLilHfRpIQ5tVx2njeeNr9CWlDL5ZUy6D0oSmrp1hpgMd2edUFj5r9OkQKBvbj1rFGUasIR6gsVLYDh9vNLOybqUvPSUuYAuHR3nROG5Na4tYQp+FmjTYq/+8von32jGfZVC2PnCJGTAewtzYj3j2A+Z0jlkO6zog9eo6wmAc9XCzxfGrfm9RFRX6prcT4ngzxZMT3bbPQh+vR65PIfloGFSqNTr9fkF7jSg3Md7ko76FYWRHJ3Td18QW4uzOH7sGzHJC6gbQH3bWxnoWc7vR/AjVLpEP/Ux root@xnode208
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQClncQ6YmWotgQVdkFoK/YWLDcAVdQ1fvGcYn7eY/Ll1JxRnjB4fJ/+k219AvdTp8JQnq213HaZbgAV27TDcvtQSHcHF6Il7Bi77JPNOqm+UGqAi9iZnODZJ1kDOPD3T6XZVo6Q9TBAn75L6PWVqtnVD6v7f6beiYbE17uCLwdWIYpeXVKSHiQiEFkXCyaLkxBWFf38YmZaSamg5Gzrzc89aKUXKBNJZs1Lfbjamabrx5q3azeSGC0E5LVnpuXpX0yMWxhGOmZse2HrVmm+BsOBIAlrmDaIkzHCIiF9LZQoxxmZSOHzEKBI7P2q4fQ+AS/EQC2gGaCTGhNvCxklzZm3 rancher@ros-gitlab
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxWMWQfZqcMnbC308L7mRLRIJr1y6nu0GnjjjA/BM/ZNTp0Q4/eXYFF6QAn+D1klsN2c3iTSqH9egnNhJBcjcci+5CZTy6hIvdgpd3HuwVy6ZouW2jlLfWvZgf6j7Ofev7284Ts/6xQ1qcpvmuqS7yQCPuFtFceMhrZLsNuoZ4RtlsVX2s8YToR/nJNVWbWmNVnE3P/4Vd9DSp80DEFISjYWGgS/l8ZE8ZQf9UG+kI5aZjqLBG57RBRIof8a5tEAnwIpLMBR7firNTT0Lmvk1YoqegHjcLLhzjm8Uj0m949+a++jSoSyRe2jbypqQG3ttM7QTdptYNS/2SdVANZRHL Arch@TBJ-x102
+
+# mounts:
+# - ["/dev/vdb", "/mnt/s", "ext4", ""]
+
+write_files:
+  # - path: /etc/apk/repositories
+  #   permissions: "0755"
+  #   owner: root
+  #   content: |
+  #     https://mirrors.ustc.edu.cn/alpine/latest-stable/main
+  #     https://mirrors.ustc.edu.cn/alpine/latest-stable/community
+
+  - path: /etc/apt/sources.list
+    permissions: "0755"
+    owner: root
+    content: |
+      deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse
+      # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse
+      deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse
+      # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse
+      deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse
+      # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse
+      deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse
+      # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse
+
+  - path: /etc/profile
+    permissions: "0755"
+    owner: root
+    content: |
+      export CHARSET=UTF-8
+      export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      export PAGER=less
+      export PS1="\[\e[37m\][\[\e[32m\]\u\[\e[37m\]@\h \[\e[36m\]\w\[\e[0m\]]\\$ "
+      export TZ='CST-8'
+      umask 022
+
+      for script in /etc/profile.d/*.sh ; do
+              if [ -r $script ] ; then
+                      . $script
+              fi
+      done
+
+  - path: /home/rancher/.bash_profile
+    permissions: "0755"
+    owner: rancher
+    content: |
+      # If the shell is interactive and .bashrc exists, get the aliases and functions
+      if [[ $- == *i* && -f ~/.bashrc ]]; then
+          . ~/.bashrc
+      fi
+
+  - path: /home/rancher/.bashrc
+    permissions: "0755"
+    owner: rancher
+    content: |
+      # .bashrc
+      # User specific aliases and functions
+      alias  d="docker "
+      alias di="docker image"
+      alias dc="docker container"
+      alias dv="docker volumn"
+      alias dn="docker netwrok"
+
+      # Source global definitions
+      if [ -f /etc/bashrc ]; then
+              . /etc/bashrc
+      fi
+
+runcmd:
+  #   - [touch, /home/rancher/test1]
+  #   - echo "test" > /home/rancher/test2
+  # - apk update
+  - apt update
+  - crond
